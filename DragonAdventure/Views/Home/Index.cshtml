@@ -1,0 +1,10 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@if (User.Identity.IsAuthenticated) {
+    @Html.Partial("_IndexLoggedIn")
+}
+else {
+    @Html.Partial("_IndexAnonymous")
+}

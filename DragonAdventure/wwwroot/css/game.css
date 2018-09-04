@@ -1,0 +1,34 @@
+#game {
+    position: relative;
+    text-align: center;
+}
+
+#game canvas {
+    image-rendering: optimizeSpeed;             /* Older versions of FF          */
+    image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+    image-rendering: -webkit-optimize-contrast; /* Safari                        */
+    image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+    image-rendering: pixelated;                 /* Awesome future-browsers       */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+}
+
+#game-canvas {
+    display: inline-block;
+    background: black;
+    width: 512px;
+/*
+    width: 100%;
+    max-width: calc(106.66vh - 140px);
+*/
+}
+
+#game-hidden {
+    display: none;
+}
+
+#game-hidden canvas {
+    background: black;
+    margin: 2px 4px !important;
+    padding: 0 !important;
+    display: inline-block;
+}

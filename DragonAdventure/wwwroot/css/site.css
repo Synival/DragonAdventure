@@ -1,0 +1,126 @@
+﻿:root {
+    --background:      #000;
+    --color:           #fff;
+    --inv-background:  #fff;
+    --inv-color:       #000;
+    --highlight:       #080;
+    --highlight-dark:  #060;
+    --highlight-color: #fff;
+}
+
+@font-face {
+    font-family: "8-bit";
+    src: url("/fonts/quadradigger-regular.ttf");
+    font-weight: normal;
+}
+@font-face {
+    font-family: "8-bit";
+    src: url("/fonts/quadradigger-bold.ttf");
+    font-weight: bold;
+}
+
+body {
+    background:  var(--background);
+    color:       var(--color);
+    font-family: "8-bit";
+    font-size:   11px;
+}
+::selection {
+    background: var(--highlight);
+    color: var(--highlight-color);
+}
+
+h5, .h5 { font-size: 13.50px; }
+h4, .h4 { font-size: 16.50px; }
+h3, .h3 { font-size: 19.50px; }
+h2, .h2 { font-size: 22.00px; }
+h1, .h1 { font-size: 26.00px; }
+
+body header, body content, body footer {
+    display: block;
+    width: 100%;
+}
+body content {
+    background: var(--inv-background);
+    color:      var(--inv-color);
+}
+body content .container {
+    padding: 15px;
+}
+body content .container:before {
+    content: none;
+}
+body content .container :first-child {
+    margin-top: 0 !important;
+}
+body content .container :last-child {
+    margin-bottom: 0 !important;
+}
+
+body footer {
+    padding: 15px 15px 0 15px;
+}
+#qrCode {
+    margin: 15px;
+}
+ul {
+    list-style: square;
+}
+
+.navbar {
+    margin-bottom: 0;
+}
+.navbar-inverse {
+    background:   none;
+    border-color: none;
+}
+.navbar-inverse .navbar-brand,
+.navbar-inverse .btn-link,
+.navbar-inverse .navbar-link,
+.navbar-inverse .navbar-nav > li > a {
+    color: var(--color) !important;
+}
+.navbar-inverse .navbar-brand {
+    font-size: 22px;
+    line-height: 30px;
+    padding: 10px 12px;
+}
+.navbar-inverse .btn-link,
+.navbar-inverse .navbar-link,
+.navbar-inverse .navbar-nav > li > a {
+    font-size: 11px;
+    line-height: 30px;
+    padding: 14px 12px 6px 12px;
+    margin: 0;
+    border: none;
+}
+
+a:before, .btn-link:before {
+    display: inline-block;
+    content: ">";
+    opacity: 0.25;
+    margin-right: 2px;
+}
+a, .btn-link {
+    color: var(--highlight);
+    opacity: 0.75;
+}
+a:hover, .btn-link:hover {
+    color: var(--highlight);
+    text-decoration: none !important;
+    opacity: 1.00;
+}
+a:hover:before, .btn-link:hover:before {
+    content: ">";
+    opacity: 1.00;
+}
+
+.nav-pills > li.active > a {
+    background-color: var(--highlight);
+}
+.nav-pills > li.active > a:hover {
+    background-color: var(--highlight-dark);
+}
+.form-control:focus {
+    border-color: var(--highlight);
+}
