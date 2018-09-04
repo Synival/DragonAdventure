@@ -1,4 +1,4 @@
-﻿"use strict"
+"use strict"
 
 function Tile(name, src, color, walkSpeed, attachTo) {
     this.name      = name;
