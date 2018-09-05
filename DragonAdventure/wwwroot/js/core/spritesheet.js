@@ -1,24 +1,26 @@
 "use strict"
 
 function Spritesheet(name, src) {
-    this.name    = name;
-    this.src     = src;
-    this.element = getImageElement('spritesheets', src);
+    var self = this;
+    self.name    = name;
+    self.src     = src;
+    self.element = getImageElement('spritesheets', src);
 }
 
 var _emptySpritesheet = null;
 function SpritesheetSet() {
+    var self = this;
     if (_emptySpritesheet == null)
         _emptySpritesheet = new Spritesheet('Empty', null);
-    this.spritesheets = {};
+    self.spritesheets = {};
 
-    this.set = function(spritesheet)
-        { this.spritesheets[spritesheet.name] = spritesheet; }
-    this.get = function(name)
-        { return (name in this.spritesheets) ? this.spritesheets[name] : _emptySpritesheet; }
+    self.set = function(spritesheet)
+        { self.spritesheets[spritesheet.name] = spritesheet; }
+    self.get = function(name)
+        { return (name in self.spritesheets) ? self.spritesheets[name] : _emptySpritesheet; }
 
-    this.nextName = function(name)
-        { return nextKeyInDict(this.spritesheets, name); };
-    this.next = function(prev)
-        { return this.get(this.nextName(prev.name)); }
+    self.nextName = function(name)
+        { return nextKeyInDict(self.spritesheets, name); };
+    self.next = function(prev)
+        { return self.get(self.nextName(prev.name)); }
 }

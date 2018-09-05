@@ -1,132 +1,135 @@
 "use strict"
 
 var Camera = function() {
-    this.x            = 0;
-    this.y            = 0;
-    this.targetX      = 0;
-    this.targetY      = 0;
-    this.lastTargetX  = 0;
-    this.lastTargetY  = 0;
-    this.deltaTargetX = 0;
-    this.deltaTargetY = 0;
-    this.moveMethod = 'smooth';
+    var self = this;
+    self.x            = 0;
+    self.y            = 0;
+    self.targetX      = 0;
+    self.targetY      = 0;
+    self.lastTargetX  = 0;
+    self.lastTargetY  = 0;
+    self.deltaTargetX = 0;
+    self.deltaTargetY = 0;
+    self.moveMethod = 'smooth';
 
-    this.moveTo = function(x, y, finish) {
-        this.targetX = x;
-        this.targetY = y;
+    self.moveTo = function(x, y, finish) {
+        self.targetX = x;
+        self.targetY = y;
         if (finish)
-            this.finish();
+            self.finish();
     };
 
-    this.getTarget = function() {
+    self.getTarget = function() {
         return {
-            x: this.targetX,
-            y: this.targetY,
+            x: self.targetX,
+            y: self.targetY,
         };
     };
 
-    this.getTopLeftInt = function() {
+    self.getTopLeftInt = function() {
         return {
-            x: Math.round(this.x - _canvasWidth  / 2),
-            y: Math.round(this.y - _canvasHeight / 2),
+            x: Math.round(self.x - _canvasWidth  / 2),
+            y: Math.round(self.y - _canvasHeight / 2),
         };
     };
 
-    this.updateTarget = function() {
-        if (this.targetX == _player.x && this.targetY == _player.y)
+    self.updateTarget = function() {
+        if (self.targetX == _player.x && self.targetY == _player.y)
             return false;
-        this.targetX = _player.x;
-        this.targetY = _player.y;
+        self.targetX = _player.x;
+        self.targetY = _player.y;
         return true;
     };
 
-    this.finish = function() {
-        var target = this.getTarget();
-        this.x = target.x;
-        this.y = target.y;
+    self.finish = function() {
+        var target = self.getTarget();
+        self.x = target.x;
+        self.y = target.y;
     };
 
-    this.isDone = function() {
-        var target = this.getTarget();
-        return target.x == this.x && target.y == this.y;
+    self.isDone = function() {
+        var target = self.getTarget();
+        return target.x == self.x && target.y == self.y;
     };
 
-    this.wrapToTarget = function() {
+    self.wrapToTarget = function() {
         var map = _game.map;
+        if (map == null)
+            return;
         var dimensions = [
             { coord: 'x', target: 'targetX', size: map.width  * _tileSize },
             { coord: 'y', target: 'targetY', size: map.height * _tileSize },
         ];
         for (var i = 0; i < dimensions.length; i++) {
             var d          = dimensions[i];
-            var wrapped    = closestWrap(this[d.coord], this[d.target], d.size);
-            this[d.coord]  = wrapped.coord;
-            this[d.target] = wrapped.target;
+            var wrapped    = closestWrap(self[d.coord], self[d.target], d.size);
+            self[d.coord]  = wrapped.coord;
+            self[d.target] = wrapped.target;
         }
     };
 
-    this.frame = function() {
-        this.updateTarget();
-        if (_game.map.wrap)
-            this.wrapToTarget();
-        var target = this.getTarget();
+    self.frame = function() {
+        self.updateTarget();
+        if (_game.map && _game.map.wrap)
+            self.wrapToTarget();
+        var target = self.getTarget();
 
-        var dtx = this.targetX - this.lastTargetX;
-        var dty = this.targetY - this.lastTargetY;
-        var dtxi = Math.round(this.targetX) - Math.round(this.lastTargetX);
-        var dtyi = Math.round(this.targetY) - Math.round(this.lastTargetY);
-        var steadyX = dtx == this.deltaTargetX && dtx != 0;
-        var steadyY = dty == this.deltaTargetY && dty != 0;
+        var dtx = self.targetX - self.lastTargetX;
+        var dty = self.targetY - self.lastTargetY;
+        var dtxi = Math.round(self.targetX) - Math.round(self.lastTargetX);
+        var dtyi = Math.round(self.targetY) - Math.round(self.lastTargetY);
+        var steadyX = dtx == self.deltaTargetX && dtx != 0;
+        var steadyY = dty == self.deltaTargetY && dty != 0;
 
-        this.deltaTargetX = dtx;
-        this.deltaTargetY = dty;
-        this.lastTargetX  = this.targetX;
-        this.lastTargetY  = this.targetY;
+        self.deltaTargetX = dtx;
+        self.deltaTargetY = dty;
+        self.lastTargetX  = self.targetX;
+        self.lastTargetY  = self.targetY;
 
         var tx = target.x, ty = target.y;
-        if (tx == this.x && ty == this.y)
+        if (tx == self.x && ty == self.y)
             return false;
-        if (this.moveMethod == 'instant') {
-            this.x = tx;
-            this.y = ty;
+        if (self.moveMethod == 'instant') {
+            self.x = tx;
+            self.y = ty;
             return true;
         }
 
         var sx = 0, sy = 0;
-        if (this.moveMethod == 'constant')
+        if (self.moveMethod == 'constant')
             { sx = 1; sy = 1; }
-        else if (this.moveMethod == 'smooth') {
-            var distX = Math.abs(this.targetX - this.x) / _tileSize;
-            var distY = Math.abs(this.targetY - this.y) / _tileSize;
+        else if (self.moveMethod == 'smooth') {
+            var distX = Math.abs(self.targetX - self.x) / _tileSize;
+            var distY = Math.abs(self.targetY - self.y) / _tileSize;
             sx = Math.round((distX/2 + 0.5) * 8) / 8;
             sy = Math.round((distY/2 + 0.5) * 8) / 8;
         }
 
-        var oldX = this.x, oldY = this.y;
-             if (this.x > tx) this.x = Math.max(this.x - sx, tx);
-        else if (this.x < tx) this.x = Math.min(this.x + sx, tx);
-             if (this.y > ty) this.y = Math.max(this.y - sy, ty);
-        else if (this.y < ty) this.y = Math.min(this.y + sy, ty);
+        var oldX = self.x, oldY = self.y;
+             if (self.x > tx) self.x = Math.max(self.x - sx, tx);
+        else if (self.x < tx) self.x = Math.min(self.x + sx, tx);
+             if (self.y > ty) self.y = Math.max(self.y - sy, ty);
+        else if (self.y < ty) self.y = Math.min(self.y + sy, ty);
 
-        if (this.moveMethod == 'smooth') {
+        if (self.moveMethod == 'smooth') {
             if (steadyX) {
                 var oxi   = Math.round(oldX);
                 var limit = Math.abs(dtxi) + 1;
-                while (Math.abs(Math.round(this.x - oxi)) == limit)
-                    this.x -= (this.x > oxi) ? 0.125 : -0.125;
+                while (Math.abs(Math.round(self.x - oxi)) == limit)
+                    self.x -= (self.x > oxi) ? 0.125 : -0.125;
             }
             if (steadyY) {
                 var oyi   = Math.round(oldY);
                 var limit = Math.abs(dtyi) + 1;
-                while (Math.abs(Math.round(this.y - oyi)) == limit)
-                    this.y -= (this.y > oyi) ? 0.125 : -0.125;
+                while (Math.abs(Math.round(self.y - oyi)) == limit)
+                    self.y -= (self.y > oyi) ? 0.125 : -0.125;
             }
         }
 
 /*
-        var nudged = nudgeCoords(oldX, oldY, this.x, this.y);
-        this.x = nudged.x;
-        this.y = nudged.y;
+        var nudged = nudgeCoords(oldX, oldY, self.x, self.y);
+        self.x = nudged.x;
+        self.y = nudged.y;
 */
 
         return true;

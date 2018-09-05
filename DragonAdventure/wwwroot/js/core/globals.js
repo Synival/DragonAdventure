@@ -31,4 +31,5 @@ var _spritesheets = null;
 var _maps         = null;
 var _render       = null;
 var _resources    = null;
+var _font         = null;
 var _game         = null;

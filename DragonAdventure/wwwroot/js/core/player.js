@@ -1,202 +1,215 @@
 "use strict"
 
 function Player() {
-    this.x           = 0;
-    this.y           = 0;
-    this.mapX        = 0;
-    this.mapY        = 0;
-    this.targetX     = 0;
-    this.targetY     = 0;
-    this.targetMapX  = 0;
-    this.targetMapY  = 0;
-    this.moveTimer   = 0;
-    this.encounters  = 0;
-    this.moveMethod  = 'smooth';
-    this.direction   = 0;
-    this.moveFrames  = 0;
-    this.justMoved   = false;
-    this.spritesheet = null;
+    var self = this;
+    self.x           = 0;
+    self.y           = 0;
+    self.mapX        = 0;
+    self.mapY        = 0;
+    self.targetX     = 0;
+    self.targetY     = 0;
+    self.targetMapX  = 0;
+    self.targetMapY  = 0;
+    self.moveTimer   = 0;
+    self.encounters  = 0;
+    self.moveMethod  = 'smooth';
+    self.direction   = 0;
+    self.moveFrames  = 0;
+    self.justMoved   = false;
+    self.spritesheet = null;
 
-    this.getMoveTime = function(map, x, y) {
+    self.getMoveTime = function(map, x, y) {
         if (map == null) map = _game.map;
-        if (x   == null) x   = this.mapX;
-        if (y   == null) y   = this.mapY;
+        if (map == null) return 1.00;
+        if (x   == null) x   = self.mapX;
+        if (y   == null) y   = self.mapY;
         var tile = map.getTile(x, y);
         return 1.00 / ((tile.walkSpeed > 0.25) ? tile.walkSpeed : 0.25);
     }
 
-    this.getMoveSpeed = function()
+    self.getMoveSpeed = function()
         { return _keysDown.cancel ? 1.5 : 1.0; }
 
-    this.movedEvent = function() {
-        if (this.encounters <= 0)
-            this.encounters = parseInt(Math.random() * 24) + 8;
-        this.encounters -= this.getMoveTime();
-        if (this.encounters <= 0)
+    self.movedEvent = function() {
+        if (self.encounters <= 0)
+            self.encounters = parseInt(Math.random() * 24) + 8;
+        self.encounters -= self.getMoveTime();
+        if (self.encounters <= 0)
             console.log("Battle!");
     };
 
-    this.updateMovement = function() {
-        if (!this.canMoveNow())
+    self.updateMovement = function() {
+        if (!self.canMoveNow())
             return false;
         var kd  = _keysDown;
         if (!(kd.left || kd.right || kd.up || kd.down))
             return false;
-        this.move((kd.left ? -1 : 0) + (kd.right ? 1 : 0),
+        self.move((kd.left ? -1 : 0) + (kd.right ? 1 : 0),
                   (kd.up   ? -1 : 0) + (kd.down  ? 1 : 0));
         return true;
     };
 
-    this.wrapPosition = function() {
+    self.wrapPosition = function() {
         var map = _game.map;
-        if (!map.wrap)
+        if (map == null || !map.wrap)
             return;
 
         var mwt = map.width  * _tileSize;
         var mht = map.height * _tileSize;
-        var x   = this.x;
-        var y   = this.y;
-        var tx  = this.targetX;
-        var ty  = this.targetY;
+        var x   = self.x;
+        var y   = self.y;
+        var tx  = self.targetX;
+        var ty  = self.targetY;
 
         while (x <  0)   { tx += mwt; x += mwt; }
         while (x >= mwt) { tx -= mwt; x -= mwt; }
         while (y <  0)   { ty += mht; y += mht; }
         while (y >= mht) { ty -= mht; y -= mht; }
-        if (this.x == x && this.y == y)
+        if (self.x == x && self.y == y)
             return;
 
-        this.x       = x;
-        this.y       = y;
-        this.targetX = tx;
-        this.targetY = ty;
+        self.x       = x;
+        self.y       = y;
+        self.targetX = tx;
+        self.targetY = ty;
     };
 
-    this.updatePosition = function() {
-        var time  = this.getMoveTime();
-        var speed = this.getMoveSpeed();
+    self.updatePosition = function() {
+        var time  = self.getMoveTime();
+        var speed = self.getMoveSpeed();
 
-        var oldX = this.x, oldY = this.y;
-             if (this.x < this.targetX) this.x = Math.min(this.targetX, this.x + speed);
-        else if (this.x > this.targetX) this.x = Math.max(this.targetX, this.x - speed);
-             if (this.y < this.targetY) this.y = Math.min(this.targetY, this.y + speed);
-        else if (this.y > this.targetY) this.y = Math.max(this.targetY, this.y - speed);
+        var oldX = self.x, oldY = self.y;
+             if (self.x < self.targetX) self.x = Math.min(self.targetX, self.x + speed);
+        else if (self.x > self.targetX) self.x = Math.max(self.targetX, self.x - speed);
+             if (self.y < self.targetY) self.y = Math.min(self.targetY, self.y + speed);
+        else if (self.y > self.targetY) self.y = Math.max(self.targetY, self.y - speed);
 
-        if (oldX != this.x || oldY != this.y) {
+        if (oldX != self.x || oldY != self.y) {
             time = 1;
-            this.justMoved = true;
+            self.justMoved = true;
         }
-        this.wrapPosition();
+        self.wrapPosition();
 
-        if (this.justMoved) {
-            var ox = this.mapX;
-            var oy = this.mapY;
-            if (this.x == this.targetX) this.mapX = this.targetMapX;
-            if (this.y == this.targetY) this.mapY = this.targetMapY;
-            if (ox != this.mapX || oy != this.mapY)
-                this.movedEvent();
+        if (self.justMoved) {
+            var ox = self.mapX;
+            var oy = self.mapY;
+            if (self.x == self.targetX) self.mapX = self.targetMapX;
+            if (self.y == self.targetY) self.mapY = self.targetMapY;
+            if (ox != self.mapX || oy != self.mapY)
+                self.movedEvent();
 
-            this.justMoved = false;
-            this.moveFrames += Math.pow(speed, 2) / time;
+            self.justMoved = false;
+            self.moveFrames += Math.pow(speed, 2) / time;
         }
         else {
-            if (this.moveTimer == 0)
-                this.moveFrames = 0;
-            else if (this.moveTimer > 0)
-                this.moveTimer = Math.max(0, this.moveTimer - speed);
+            if (self.moveTimer == 0)
+                self.moveFrames = 0;
+            else if (self.moveTimer > 0)
+                self.moveTimer = Math.max(0, self.moveTimer - speed);
         }
     };
 
-    this.frame = function() {
-        this.updateMovement();
-        this.updatePosition();
+    self.frame = function() {
+        self.updateMovement();
+        self.updatePosition();
     };
 
-    this.canMove = function() {
+    self.canMove = function() {
         return true;
     };
 
-    this.canMoveNow = function() {
-        if (!this.canMove())
+    self.canMoveNow = function() {
+        if (!self.canMove())
             return false;
-        if (!(this.x == this.targetX && this.y == this.targetY))
+        if (!(self.x == self.targetX && self.y == self.targetY))
             return false;
-        if (this.moveTimer > 0)
+        if (self.moveTimer > 0)
             return false;
         return true;
     };
 
-    this.canMoveToTile = function(tile)
+    self.canMoveToTile = function(tile)
         { return tile.walkSpeed > 0.00; }
 
-    this.moveToTile = function(x, y) {
-        this.moveTo(x * _tileSize, y * _tileSize);
+    self.moveToTile = function(x, y) {
+        self.moveTo(x * _tileSize, y * _tileSize);
     }
 
-    this.moveTo = function(x, y) {
+    self.moveTo = function(x, y) {
         var ts  = _tileSize;
         var map = _game.map;
-        this.x          = mod(x, map.width  * ts);
-        this.y          = mod(y, map.height * ts);
-        this.mapX       = mod(Math.round(this.x / ts), map.width);
-        this.mapY       = mod(Math.round(this.y / ts), map.height);
-        this.targetX    = this.x;
-        this.targetY    = this.y;
-        this.targetMapX = this.mapX;
-        this.targetMapY = this.mapY;
+        if (map == null) {
+            self.x    = x;
+            self.y    = y;
+            self.mapX = Math.round(self.x / ts);
+            self.mapY = Math.round(self.y / ts);
+        }
+        else {
+            self.x    = mod(x, map.width  * ts);
+            self.y    = mod(y, map.height * ts);
+            self.mapX = mod(Math.round(self.x / ts), map.width);
+            self.mapY = mod(Math.round(self.y / ts), map.height);
+        }
+        self.targetX    = self.x;
+        self.targetY    = self.y;
+        self.targetMapX = self.mapX;
+        self.targetMapY = self.mapY;
     };
 
-    this.move = function(x, y) {
+    self.move = function(x, y) {
         var map     = _game.map;
-        var nx      = this.targetX;
-        var ny      = this.targetY;
-        var time    = this.getMoveTime();
-        var speed   = this.getMoveSpeed();
+        if (map == null)
+            return;
+
+        var nx      = self.targetX;
+        var ny      = self.targetY;
+        var time    = self.getMoveTime();
+        var speed   = self.getMoveSpeed();
         var ts      = _tileSize;
         var canMove = true;
 
-        if (this.moveMethod == 'dq' && x != 0)
+        if (self.moveMethod == 'dq' && x != 0)
             y = 0;
 
-             if (x == 0 && y >  0) this.direction = 0;
-        else if (x <  0 && y >  0) this.direction = 1;
-        else if (x <  0 && y == 0) this.direction = 2;
-        else if (x <  0 && y <  0) this.direction = 3;
-        else if (x == 0 && y <  0) this.direction = 4;
-        else if (x >  0 && y <  0) this.direction = 5;
-        else if (x >  0 && y == 0) this.direction = 6;
-        else if (x >  0 && y >  0) this.direction = 7;
+             if (x == 0 && y >  0) self.direction = 0;
+        else if (x <  0 && y >  0) self.direction = 1;
+        else if (x <  0 && y == 0) self.direction = 2;
+        else if (x <  0 && y <  0) self.direction = 3;
+        else if (x == 0 && y <  0) self.direction = 4;
+        else if (x >  0 && y <  0) self.direction = 5;
+        else if (x >  0 && y == 0) self.direction = 6;
+        else if (x >  0 && y >  0) self.direction = 7;
 
-        if (this.moveMethod == 'dq') {
-            nx = (this.targetMapX + x) * ts;
-            ny = (this.targetMapY + y) * ts;
+        if (self.moveMethod == 'dq') {
+            nx = (self.targetMapX + x) * ts;
+            ny = (self.targetMapY + y) * ts;
 
             var tx = Math.round(nx / ts);
             var ty = Math.round(ny / ts);
-            if (!this.canMoveToTile(map.getTile(tx, ty)))
+            if (!self.canMoveToTile(map.getTile(tx, ty)))
                 return false;
         }
-        else if (this.moveMethod == 'smooth') {
+        else if (self.moveMethod == 'smooth') {
             if (x != 0 && y != 0)
                 speed /= Math.hypot(x, y);
-            nx = Math.round((this.targetX + (x * speed / time)) * 8) / 8;
-            ny = Math.round((this.targetY + (y * speed / time)) * 8) / 8;
+            nx = Math.round((self.targetX + (x * speed / time)) * 8) / 8;
+            ny = Math.round((self.targetY + (y * speed / time)) * 8) / 8;
 
-            var nudged = nudgeCoords(this.targetX, this.targetY, nx, ny);
+            var nudged = nudgeCoords(self.targetX, self.targetY, nx, ny);
             nx = nudged.x;
             ny = nudged.y;
 
-            var mx = this.targetMapX;
-            var my = this.targetMapY;
+            var mx = self.targetMapX;
+            var my = self.targetMapY;
             var tx = Math.round(nx / ts);
             var ty = Math.round(ny / ts);
             var dx = (mx != tx);
             var dy = (my != ty);
 
             if (dx || dy) {
-                var canMoveX = !dx ||    this.canMoveToTile(map.getTile(tx, my));
-                var canMoveY = !dy ||    this.canMoveToTile(map.getTile(mx, ty));
-                var canMoveD = !dx||!dy||this.canMoveToTile(map.getTile(tx, ty));
+                var canMoveX = !dx ||    self.canMoveToTile(map.getTile(tx, my));
+                var canMoveY = !dy ||    self.canMoveToTile(map.getTile(mx, ty));
+                var canMoveD = !dx||!dy||self.canMoveToTile(map.getTile(tx, ty));
                 if (!canMoveD && canMoveX && canMoveY) {
                     canMoveX = false;
                     canMoveY = false;
@@ -209,14 +222,14 @@ function Player() {
                     canMoveY = false;
 
                 var ts2 = parseInt(ts / 2);
-                if (dx && !canMoveX) nx = (this.targetMapX*ts) + (ts2*x) - (x>0 ? 0.125 : 0);
-                if (dy && !canMoveY) ny = (this.targetMapY*ts) + (ts2*y) - (y>0 ? 0.125 : 0);
+                if (dx && !canMoveX) nx = (self.targetMapX*ts) + (ts2*x) - (x>0 ? 0.125 : 0);
+                if (dy && !canMoveY) ny = (self.targetMapY*ts) + (ts2*y) - (y>0 ? 0.125 : 0);
             }
         }
 
         // Assume we've checked if moving is okay. If we haven't,
         // change conditions to allow moving anyway.
-        this.moveTo(this.targetX, this.targetY);
+        self.moveTo(self.targetX, self.targetY);
 
         var mw  = map.width;
         var mh  = map.height;
@@ -230,34 +243,34 @@ function Player() {
             else if (ny >= mht) ny = mht - 1;
         }
 
-        this.targetX    = nx;
-        this.targetY    = ny;
-        this.targetMapX = mod(Math.round(nx / ts), mw);
-        this.targetMapY = mod(Math.round(ny / ts), mh);
+        self.targetX    = nx;
+        self.targetY    = ny;
+        self.targetMapX = mod(Math.round(nx / ts), mw);
+        self.targetMapY = mod(Math.round(ny / ts), mh);
 
-        if (this.moveMethod == 'dq') {
-            this.moveTimer = ts * this.getMoveTime(
-                map, this.targetMapX, this.targetMapY) - ts;
+        if (self.moveMethod == 'dq') {
+            self.moveTimer = ts * self.getMoveTime(
+                map, self.targetMapX, self.targetMapY) - ts;
         }
-        else if (this.moveMethod == 'smooth') {
-            this.x = this.targetX;
-            this.y = this.targetY;
+        else if (self.moveMethod == 'smooth') {
+            self.x = self.targetX;
+            self.y = self.targetY;
         }
 
-        this.justMoved = true;
+        self.justMoved = true;
         return canMove;
     };
 
-    this.getImage = function() {
-        var ss = this.spritesheet;
+    self.getImage = function() {
+        var ss = self.spritesheet;
         if (ss == null)
             return null;
         return {
             element: ss.element,
             width:   _tileSize,
             height:  _tileSize,
-            x:       this.direction * _tileSize,
-            y:       (Math.ceil(this.moveFrames / 15) % 2) * _tileSize,
+            x:       self.direction * _tileSize,
+            y:       (Math.ceil(self.moveFrames / 15) % 2) * _tileSize,
             offX:    0,
             offY:    0
         };

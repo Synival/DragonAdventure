@@ -1,15 +1,16 @@
 "use strict"
 
 function Tile(name, src, color, walkSpeed, attachTo) {
-    this.name      = name;
-    this.src       = src;
-    this.color     = color;
-    this.walkSpeed = walkSpeed;
-    this.element   = getImageElement('tiles', src);
-    this.attachTo  = (attachTo == null) ? [] : attachTo;
+    var self = this;
+    self.name      = name;
+    self.src       = src;
+    self.color     = color;
+    self.walkSpeed = walkSpeed;
+    self.element   = getImageElement('tiles', src);
+    self.attachTo  = (attachTo == null) ? [] : attachTo;
 
-    this.getImages = function(map, x, y) {
-        var element = this.element;
+    self.getImages = function(map, x, y) {
+        var element = self.element;
         var images = [];
         if (element == null)
             return images;
@@ -34,7 +35,6 @@ function Tile(name, src, color, walkSpeed, attachTo) {
         else {
             if (map == null)
                 map = _game.map;
-            var self = this;
             var f = function(offX, offY) {
                 var tile = map.getTile(x + offX, y + offY);
                 if (tile == self)
@@ -85,12 +85,13 @@ function Tile(name, src, color, walkSpeed, attachTo) {
 
 var _emptyTile = null;
 function TileSet() {
+    var self = this;
     if (_emptyTile == null)
         _emptyTile = new Tile('empty', null, "#000", 0.00);
 
-    this.tiles = {};
-    this.set = function(ref, tile)
-        { this.tiles[ref] = tile; }
-    this.get = function(ref)
-        { return (ref in this.tiles) ? this.tiles[ref] : _emptyTile; };
+    self.tiles = {};
+    self.set = function(ref, tile)
+        { self.tiles[ref] = tile; }
+    self.get = function(ref)
+        { return (ref in self.tiles) ? self.tiles[ref] : _emptyTile; };
 }

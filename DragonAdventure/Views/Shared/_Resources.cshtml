@@ -1,19 +1,20 @@
 @using DragonAdventure.Helpers
 
 <div style='display: none'>
-    <div id='spritesheets'> @{
-        foreach (var f in FileHelpers.WwwFiles("/images/spritesheets", true)) {
-            <img src='@f' />
-        }
-    } </div>
-    <div id='tiles'> @{
-        foreach (var f in FileHelpers.WwwFiles("/images/tiles", true)) {
-            <img src='@f' />
-        }
-    } </div>
-    <div id='scripts'> @{
-        foreach (var f in FileHelpers.WwwFiles("/js/core", true)) {
-            <script src='@f'></script>
-        }
-    } </div>
+    <div id='spritesheets'>
+        @foreach(var f in FileHelpers.WwwFiles("/images/spritesheets", true))
+            { <img src='@f' /> }
+    </div>
+    <div id='tiles'>
+        @foreach(var f in FileHelpers.WwwFiles("/images/tiles", true))
+            { <img src='@f' /> }
+    </div>
+    <div id='fonts'>
+        @foreach(var f in FileHelpers.WwwFiles("/images/fonts", true))
+            { <img src='@f' /> }
+    </div>
+    <div id='scripts'>
+        @foreach(var f in FileHelpers.WwwFiles("/js/core", true))
+            { <script src='@f'></script> }
+    </div>
 </div>

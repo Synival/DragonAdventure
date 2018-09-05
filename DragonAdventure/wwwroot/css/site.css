@@ -23,18 +23,18 @@ body {
     background:  var(--background);
     color:       var(--color);
     font-family: "8-bit";
-    font-size:   11px;
+    font-size:   8pt;
 }
 ::selection {
     background: var(--highlight);
     color: var(--highlight-color);
 }
 
-h5, .h5 { font-size: 13.50px; }
-h4, .h4 { font-size: 16.50px; }
-h3, .h3 { font-size: 19.50px; }
-h2, .h2 { font-size: 22.00px; }
-h1, .h1 { font-size: 26.00px; }
+h5, .h5 { font-size: 10.00pt; }
+h4, .h4 { font-size: 12.00pt; }
+h3, .h3 { font-size: 14.00pt; }
+h2, .h2 { font-size: 16.00pt; }
+h1, .h1 { font-size: 18.00pt; }
 
 body header, body content, body footer {
     display: block;

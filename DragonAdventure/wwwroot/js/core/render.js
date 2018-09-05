@@ -1,24 +1,79 @@
 "use strict"
 
 function Render() {
-    this.lastMap = null;
-    this.sectors = [];
+    var self = this;
+    self.lastMap = null;
+    self.sectors = [];
 
-    this.frame = function() {
-        this.updateAllSectors();
-        this.updateCanvas();
+    self.frame = function() {
+        self.updateAllSectors();
+        self.updateCanvas();
     };
 
-    this.updateCanvas = function() {
-        var destCtx = _$canvas[0].getContext('2d');
+    self.getContext = function()
+        { return _$canvas[0].getContext('2d'); }
+
+    self.updateCanvas = function() {
+        var destCtx = self.getContext();
         destCtx.clearRect(0, 0, _canvasElementWidth, _canvasElementHeight);
 
         var map = _game.map;
         if (map != null)
-            this.drawMap(destCtx, map);
+            self.drawMap(destCtx, map);
+
+        var pos = 1;
+        var f = function(t1, t2, t3) {
+            if (t1) self.drawText(1, pos, t1);
+            if (t2) self.drawText(100 - String(parseInt(t2)).length * 7,  pos, t2);
+            if (t3) self.drawText(175 - String(parseInt(t3)).length * 7,  pos, t3);
+            pos += 10;
+        }
+
+        f("Player:",  _player.x,          _player.y);
+        f("tPlayer:", _player.targetX,    _player.targetY);
+        f("Map:",     _player.mapX,       _player.mapY);
+        f("tMap:",    _player.targetMapX, _player.targetMapY);
+        f("Camera:",  _camera.x,          _camera.x);
+        f("tCamera:", _camera.targetX,    _camera.targetY);
+
+        pos += 5;
+        f("Map:",        (_game.map == null) ? '(null)' : _game.map.name);
+        f("Walk mode:",  _player.moveMethod);
+        f("Cam. mode: ", _camera.moveMethod);
+
+        var count = _resources.loadingCount();
+        if (count > 0)
+            self.drawText(1, _canvasHeight - 11, "Loading " + count + " resources...");
     };
 
-    this.drawMap = function(destCtx, map) {
+    self.drawText = function(x, y, text) {
+        x += _canvasOffsetX;
+        y += _canvasOffsetY;
+        text = String(text);
+
+        var destCtx = self.getContext();
+        var startX = x;
+        var element = _font.element;
+        for (var i = 0; i < text.length; i++) {
+            var code = text.charCodeAt(i);
+            if (code == 10) {
+                x = startX;
+                y += 10;
+                continue;
+            }
+
+            var ch = _font.chars[code];
+            if (ch == null)
+                continue;
+            destCtx.drawImage(element,
+                ch.x,           ch.y,           ch.width, ch.height,
+                x + ch.offsetX, y + ch.offsetY, ch.width, ch.height);
+            x += ch.advanceX;
+        }
+    }
+
+    self.drawMap = function(map) {
+        var destCtx = self.getContext();
         var ts  = _tileSize;
         var ts2 = parseInt(ts / 2);
         var mw  = map.width;
@@ -32,11 +87,11 @@ function Render() {
         var cox = _canvasOffsetX;
         var coy = _canvasOffsetY;
 
-        var sectorCoords = this.getSectorCoords();
+        var sectorCoords = self.getSectorCoords();
         var ulX = sectorCoords.x;
         var ulY = sectorCoords.y;
         for (var i = 0; i < 4; i++) {
-            var sector = this.sectors[i];
+            var sector = self.sectors[i];
             if (sector == null)
                 continue;
             var sectorCanvas = _$sectorCanvas[sector.canvasIndex][0];
@@ -94,27 +149,27 @@ function Render() {
         }
     };
 
-    this.resetSectors = function() {
-        this.sectors = [];
+    self.resetSectors = function() {
+        self.sectors = [];
     };
 
-    this.updateAllSectors = function() {
+    self.updateAllSectors = function() {
         var newSectors = [];
         var canvasUsed = [];
 
-        var sectorCoords = this.getSectorCoords();
+        var sectorCoords = self.getSectorCoords();
         var ulX = sectorCoords.x;
         var ulY = sectorCoords.y;
 
-        if (_game.map != this.lastMap) {
-            this.resetSectors();
-            this.lastMap = _game.map;
+        if (_game.map != self.lastMap) {
+            self.resetSectors();
+            self.lastMap = _game.map;
         }
 
         for (var i = 0; i < 4; i++) {
             var sx = ulX + parseInt(i % 2);
             var sy = ulY + parseInt(i / 2);
-            var sector = this.getSector(
+            var sector = self.getSector(
                 ulX + parseInt(i % 2),
                 ulY + parseInt(i / 2));
             if (sector !== null) {
@@ -136,12 +191,12 @@ function Render() {
             newSectors[i] =
                 { canvasIndex: canvasUnused[canvasUnusedIndex++],
                   x: sx, y: sy };
-            this.updateSector(newSectors[i]);
+            self.updateSector(newSectors[i]);
         }
-        this.sectors = newSectors;
+        self.sectors = newSectors;
     };
 
-    this.updateSector = function(sector) {
+    self.updateSector = function(sector) {
         var ulX     = sector.x * _sectorNumTilesX;
         var ulY     = sector.y * _sectorNumTilesY;
         var map     = _game.map;
@@ -176,7 +231,7 @@ function Render() {
         return true;
     };
 
-    this.getSectorCoords = function() {
+    self.getSectorCoords = function() {
         var ts2 = Math.floor(_tileSize / 2);
         var topLeft = _camera.getTopLeftInt();
         return {
@@ -185,9 +240,9 @@ function Render() {
         };
     };
 
-    this.getSector = function(x, y) {
+    self.getSector = function(x, y) {
         for (var i = 0; i < 4; i++) {
-            var sector = this.sectors[i];
+            var sector = self.sectors[i];
             if (sector != null && sector.x === x && sector.y === y)
                 return sector;
         }

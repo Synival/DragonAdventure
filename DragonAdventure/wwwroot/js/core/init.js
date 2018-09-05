@@ -57,6 +57,7 @@ window.addEventListener('load', function() {
     //_spritesheets.set(new Spritesheet('wizard',      'wizard.png'));
 
     // Initialize our game state
+    fontInit();
     keysInit();
     _camera    = new Camera();
     _player    = new Player();
