@@ -68,7 +68,7 @@ var Camera = function() {
         }
     };
 
-    self.frame = function() {
+    self.runFrame = function() {
         self.updateTarget();
         if (_game.map && _game.map.wrap)
             self.wrapToTarget();

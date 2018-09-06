@@ -5,7 +5,7 @@ function Render() {
     self.lastMap = null;
     self.sectors = [];
 
-    self.frame = function() {
+    self.runFrame = function() {
         self.updateAllSectors();
         self.updateCanvas();
     };
@@ -22,7 +22,7 @@ function Render() {
             self.drawMap(destCtx, map);
         self.drawDebug(_debugMode);
 
-        var count = _resources.loadingCount();
+        var count = _resources.getLoadingCount();
         if (count > 0)
             self.drawText(1, _canvasHeight - 11, "Loading " + count + " resources...");
     };

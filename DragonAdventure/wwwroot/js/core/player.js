@@ -109,7 +109,7 @@ function Player() {
         }
     };
 
-    self.frame = function() {
+    self.runFrame = function() {
         self.updateMovement();
         self.updatePosition();
     };

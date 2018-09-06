@@ -1,25 +1,40 @@
 "use strict"
 
+function _keyTypeFunc(key)
+    { return (typeof(key) === 'string') ? 'name' : 'id'; }
+
 function Resource(type, key, callback) {
     var self = this;
-    var keyType = (typeof(key) === 'string') ? 'name' : 'id';
+    var keyType = _keyTypeFunc(key);
     var method  = (keyType == 'name') ? 'GetByName' : 'GetById';
-    var id      = (keyType == 'name') ? null : parseFloat(key);
+    var id      = (keyType == 'name') ? null : parseInt(key);
     var name    = (keyType == 'name') ? key  : null;
 
     var controller = capitalizeString(type);
     self.type    = type;
+    self.key     = key;
+    self.keyType = keyType;
     self.id      = id;
     self.name    = name;
-    self.src     = '/' + controller + '/' + method +
-        '?' + keyType + '=' + encodeURIComponent(key);
     self.loading = false;
     self.loaded  = false;
     self.failed  = false;
     self.data    = null;
     self.model   = null;
 
-    if (type != null && key != null && type != 'none') {
+    self.isLoadable = function() {
+        return self.type != null &&
+               self.key  != null &&
+               self.type != 'none';
+    }
+    self.src = (!self.isLoadable()) ? null :
+        '/' + controller + '/' + method +
+        '?' + keyType + '=' + encodeURIComponent(key);
+
+    self.load = function() {
+        if (!self.isLoadable() || self.loading || self.loaded || self.failed)
+            return;
+
         self.loading = true;
         api(self.src, function(result) {
             self.data = result;
@@ -44,9 +59,7 @@ function Resource(type, key, callback) {
             if (callback)
                 callback.call(self, self, self.model, self.data);
         });
-    }
-    else {
-        self.src = null;
+        return true;
     }
 };
 
@@ -55,24 +68,44 @@ function ResourceSet() {
     var self = this;
     if (_emptyResource == null)
         _emptyResource = new Resource('none', 'empty', null);
-    self.resources = {};
+    self.resources = [];
 
-    self.set = function(resource)
-        { self.resources[resource.type + '_' + resource.name] = resource; }
-    self.get = function(type, name) {
-        var full = (type + '_' + name);
-        return (full in self.resources)
-            ? self.resources[full] : _emptyResource;
+    self.load = function(type, key, callback) {
+        var keyType = _keyTypeFunc(key);
+        if (keyType === 'name' && self.getByName(type, key))
+            return null;
+        if (keyType === 'id' && self.getById(type, key))
+            return null;
+
+        var resource = new Resource(type, key, callback);
+        resource.load();
+        self.resources.push(resource);
+        return resource;
     };
 
-    self.nextName = function(name)
-        { return nextKeyInDict(self.resources, name); };
-    self.next = function(prev)
-        { return self.resources[self.nextName(prev.name)]; };
-    self.loadingCount = function() {
+    self.getById = function(type, id) {
+        id = parseInt(id);
+        for (var i = 0; i < self.resources.length; i++) {
+            var r = self.resources[i];
+            if (r.type == type && r.id == id)
+                return r;
+        }
+        return null;
+    };
+
+    self.getByName = function(type, name) {
+        for (var i = 0; i < self.resources.length; i++) {
+            var r = self.resources[i];
+            if (r.type == type && r.name == name)
+                return r;
+        }
+        return null;
+    };
+
+    self.getLoadingCount = function() {
         var count = 0;
-        for (var key in self.resources)
-            if (self.resources[key].loading)
+        for (var i = 0; i < self.resources.length; i++)
+            if (self.resources[i].loading)
                 count++;
         return count;
     };

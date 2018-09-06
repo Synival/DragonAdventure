@@ -7,10 +7,10 @@ function Game() {
     self.map      = null;
     self.menus    = [];
 
-    self.frame = function() {
-        _player.frame();
-        _camera.frame();
-        _render.frame();
+    self.runFrame = function() {
+        _player.runFrame();
+        _camera.runFrame();
+        _render.runFrame();
     };
 
     self.setMap = function(map, x, y) {
@@ -66,21 +66,19 @@ function Game() {
         self.state = 'map';
         _player.spritesheet = _spritesheets.get('priest');
 
-        var loadCount = 0;
         function whenLoaded()
             { self.setMap(_maps.get('dq2')); }
         function loadedFunc(resource, model) {
-            if (--loadCount == 0)
+            if (_resources.getLoadingCount() == 0)
                 whenLoaded();
         }
 
         api('/Map/GetList', function(result) {
-            loadCount += result.length;
             for (var i = 0; i < result.length; i++)
-                _resources.set(new Resource('map', result[i].id, loadedFunc));
+                _resources.load('map', result[i].name, loadedFunc);
         });
 
-        _render.frame();
-        self.interval = setInterval(self.frame, 1000.00 / 60.00);
+        _render.runFrame();
+        self.interval = setInterval(self.runFrame, 1000.00 / 60.00);
     };
 }
