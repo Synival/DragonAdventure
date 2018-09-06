@@ -1,3 +1,4 @@
+using DragonAdventure.Data;
 using DragonAdventure.Models;
 using DragonAdventure.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -12,13 +13,21 @@ using System.Threading.Tasks;
 namespace DragonAdventure.Controllers {
     [Authorize, Route("[controller]/[action]")]
     public class MapController : Controller {
+        private readonly MapRepository _mapRepository;
+
         public class GetMapListVm {
             public int Id { get; set; }
             public string Name { get; set; }
         }
 
+        private ApplicationDbContext _dbcontext = null;
+        public MapController(ApplicationDbContext dbcontext) {
+            _dbcontext = dbcontext;
+            _mapRepository = new MapRepository(dbcontext);
+        }
+
         public List<GetMapListVm> GetList(string sort = null) {
-            var query = MapRepository.MapList
+            var query = _mapRepository.GetAll()
                 .Select(x => new GetMapListVm() { Id = x.Id, Name = x.Name });
             if (sort == "id")
                 query = query.OrderBy(x => x.Id);
@@ -27,14 +36,10 @@ namespace DragonAdventure.Controllers {
             return query.ToList();
         }
 
-        public MapVm GetByName([Required] string name) {
-            try { return MapRepository.GetByName(name); }
-            catch (Exception e) { return new MapVm(e.Message); }
-        }
+        public MapVm GetByName([Required] string name)
+            => _mapRepository.GetVmByName(name);
 
-        public MapVm GetById(int id) {
-            try { return MapRepository.GetById(id); }
-            catch (Exception e) { return new MapVm(e.Message); }
-        }
+        public MapVm GetById(int id)
+            => _mapRepository.GetVmById(id);
     }
 }

@@ -46,7 +46,10 @@ function Render() {
         }
 
         if (mode == 'map') {
-            f("Map:",        (_game.map == null) ? '(null)' : _game.map.name);
+            f("Map:",        (_game.map == null) ? '(null)'
+                : (_game.map.name + ' (#' + _game.map.id + ')'));
+            f("Dimensions:", (_game.map == null) ? ''
+                : (_game.map.width + 'x' + _game.map.height));
             f("Walk mode:",  _player.moveMethod);
             f("Cam. mode: ", _camera.moveMethod);
         }

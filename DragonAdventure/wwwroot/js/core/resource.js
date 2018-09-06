@@ -21,7 +21,7 @@ function Resource(type, key, callback) {
 
     if (type != null && key != null && type != 'none') {
         self.loading = true;
-        $.getJSON(self.src, jquerySuccessFunc(self.src, function(result) {
+        api(self.src, function(result) {
             self.data = result;
             self.id   = result.id;
             self.name = result.name;
@@ -37,11 +37,9 @@ function Resource(type, key, callback) {
                     break;
             }
             self.loaded = true;
-        }))
-        .fail(jqueryErrorFunc(self.src, function() {
+        }, function() {
             self.failed = true;
-        }))
-        .complete(function() {
+        }, function() {
             self.loading = false;
             if (callback)
                 callback.call(self, self, self.model, self.data);

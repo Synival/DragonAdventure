@@ -12,7 +12,6 @@ using DragonAdventure.Repositories;
 namespace DragonAdventure {
     public class Program {
         public static int Main(string[] args) {
-            MapRepository.InitMaps();
             BuildWebHost(args).Run();
             return 0;
         }

@@ -66,8 +66,7 @@ function Game() {
         self.state = 'map';
         _player.spritesheet = _spritesheets.get('priest');
 
-
-        var loadCount = 3;
+        var loadCount = 0;
         function whenLoaded()
             { self.setMap(_maps.get('dq2')); }
         function loadedFunc(resource, model) {
@@ -75,9 +74,11 @@ function Game() {
                 whenLoaded();
         }
 
-        _resources.set(new Resource('map', 'test', loadedFunc));
-        _resources.set(new Resource('map', 'dq1',  loadedFunc));
-        _resources.set(new Resource('map', 'dq2',  loadedFunc));
+        api('/Map/GetList', function(result) {
+            loadCount += result.length;
+            for (var i = 0; i < result.length; i++)
+                _resources.set(new Resource('map', result[i].id, loadedFunc));
+        });
 
         _render.frame();
         self.interval = setInterval(self.frame, 1000.00 / 60.00);

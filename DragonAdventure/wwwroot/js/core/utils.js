@@ -90,13 +90,14 @@ function nextKeyInDict(dict, prev) {
 }
 
 function jqueryError(jqxhr, textStatus, message, url) {
-    console.error("Request error (" + url + "):");
+    var errors = "Request error (" + url + "):";
     if (jqxhr != null && jqxhr.status != null)
-        console.error("   Response code: " + jqxhr.status);
+        errors += "\n   Response code: " + jqxhr.status;
     if (textStatus != null)
-        console.error("   Error message: " + textStatus);
+        errors += "\n   Error message: " + textStatus;
     if (message != null)
-        console.error("   Message: " + message);
+        errors += "\n   Message: " + message;
+    console.error(errors);
 }
 
 function jqueryErrorFunc(url, func) {
@@ -127,4 +128,22 @@ function capitalizeString(str) {
     if (typeof(str) !== 'string' || str.length !== 0)
         return str;
     return type.charAt(0).toUpperCase() + type.slice(1);
+}
+
+function api(url, successFunc, failFunc, completeFunc) {
+    var success = null;
+    $.getJSON(url, jquerySuccessFunc(url, function(result) {
+        success = true;
+        if (successFunc)
+            successFunc(result);
+    }))
+    .fail(jqueryErrorFunc(url, function() {
+        success = false;
+        if (failFunc)
+            failFunc(result);
+    }))
+    .complete(function() {
+        if (completeFunc)
+            completeFunc(success);
+    });
 }
