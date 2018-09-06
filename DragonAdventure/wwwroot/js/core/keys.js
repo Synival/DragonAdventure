@@ -2,16 +2,22 @@
 
 function keysUpdate() {
     var newKeysDown = {
-        up:       _keyCodesDown[38] || _keyCodesDown[104],
-        down:     _keyCodesDown[40] || _keyCodesDown[98],
-        left:     _keyCodesDown[37] || _keyCodesDown[100],
-        right:    _keyCodesDown[39] || _keyCodesDown[102],
-        action:   _keyCodesDown[90],
-        cancel:   _keyCodesDown[88],
-        special1: _keyCodesDown[81],
-        special2: _keyCodesDown[87],
-        special3: _keyCodesDown[69],
-        special4: _keyCodesDown[82],
+        up:        _keyCodesDown[38] || _keyCodesDown[104],
+        down:      _keyCodesDown[40] || _keyCodesDown[98],
+        left:      _keyCodesDown[37] || _keyCodesDown[100],
+        right:     _keyCodesDown[39] || _keyCodesDown[102],
+        action:    _keyCodesDown[90],
+        cancel:    _keyCodesDown[88],
+        special1:  _keyCodesDown[49],
+        special2:  _keyCodesDown[50],
+        special3:  _keyCodesDown[51],
+        special4:  _keyCodesDown[52],
+        special5:  _keyCodesDown[53],
+        special6:  _keyCodesDown[54],
+        special7:  _keyCodesDown[55],
+        special8:  _keyCodesDown[56],
+        special9:  _keyCodesDown[57],
+        special10: _keyCodesDown[48],
     };
     if (newKeysDown.up && newKeysDown.down)
         { newKeysDown.up   = false; newKeysDown.down  = false; }

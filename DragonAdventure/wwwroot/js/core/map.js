@@ -1,7 +1,8 @@
 "use strict"
 
-function Map(name, wrap, ascii) {
+function Map(id, name, wrap, ascii) {
     var self = this;
+    self.id     = id;
     self.name   = name;
     self.wrap   = wrap;
     self.width  = 0;
@@ -36,7 +37,7 @@ var _emptyMap = null;
 function MapSet() {
     var self = this;
     if (_emptyMap == null)
-        _emptyMap = new Map('empty', false, [
+        _emptyMap = new Map(0, 'empty', false, [
             '*****',
             '*#.#*',
             '*...*',

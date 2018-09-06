@@ -11,7 +11,7 @@ function Render() {
     };
 
     self.getContext = function()
-        { return _$canvas[0].getContext('2d'); }
+        { return _$canvas[0].getContext('2d'); };
 
     self.updateCanvas = function() {
         var destCtx = self.getContext();
@@ -20,7 +20,14 @@ function Render() {
         var map = _game.map;
         if (map != null)
             self.drawMap(destCtx, map);
+        self.drawDebug(_debugMode);
 
+        var count = _resources.loadingCount();
+        if (count > 0)
+            self.drawText(1, _canvasHeight - 11, "Loading " + count + " resources...");
+    };
+
+    self.drawDebug = function(mode) {
         var pos = 1;
         var f = function(t1, t2, t3) {
             if (t1) self.drawText(1, pos, t1);
@@ -29,21 +36,20 @@ function Render() {
             pos += 10;
         }
 
-        f("Player:",  _player.x,          _player.y);
-        f("tPlayer:", _player.targetX,    _player.targetY);
-        f("Map:",     _player.mapX,       _player.mapY);
-        f("tMap:",    _player.targetMapX, _player.targetMapY);
-        f("Camera:",  _camera.x,          _camera.x);
-        f("tCamera:", _camera.targetX,    _camera.targetY);
+        if (mode == 'coords') {
+            f("Player:",  _player.x,          _player.y);
+            f("tPlayer:", _player.targetX,    _player.targetY);
+            f("Map:",     _player.mapX,       _player.mapY);
+            f("tMap:",    _player.targetMapX, _player.targetMapY);
+            f("Camera:",  _camera.x,          _camera.x);
+            f("tCamera:", _camera.targetX,    _camera.targetY);
+        }
 
-        pos += 5;
-        f("Map:",        (_game.map == null) ? '(null)' : _game.map.name);
-        f("Walk mode:",  _player.moveMethod);
-        f("Cam. mode: ", _camera.moveMethod);
-
-        var count = _resources.loadingCount();
-        if (count > 0)
-            self.drawText(1, _canvasHeight - 11, "Loading " + count + " resources...");
+        if (mode == 'map') {
+            f("Map:",        (_game.map == null) ? '(null)' : _game.map.name);
+            f("Walk mode:",  _player.moveMethod);
+            f("Cam. mode: ", _camera.moveMethod);
+        }
     };
 
     self.drawText = function(x, y, text) {

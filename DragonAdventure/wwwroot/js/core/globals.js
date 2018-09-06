@@ -24,6 +24,8 @@ for (var i = 0; i < 256; i++)
     _keyCodesDown[i] = false;
 var _keysDown = {};
 
+var _debugMode = 'none';
+
 var _camera       = null;
 var _player       = null;
 var _tileset      = null;

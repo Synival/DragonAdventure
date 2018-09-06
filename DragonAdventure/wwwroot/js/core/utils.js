@@ -112,6 +112,8 @@ function jquerySuccessFunc(url, func) {
     return function(result) {
         if (result == null)
             return jqueryError(null, null, "Empty result", url);
+        else if (typeof(result.Error) === 'string')
+            return jqueryError(null, null, result.Error);
         else if (result.Error === true)
             return jqueryError(null, null, "Error reported", url);
         else if (result.Error != null)

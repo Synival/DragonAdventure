@@ -48,6 +48,14 @@ function Game() {
             };
             _player.moveMethod = nextKeyInDict(modes, _player.moveMethod);
         }
+        else if (key == 'special10') {
+            var modes = {
+                'none':   null,
+                'coords': null,
+                'map':    null,
+            };
+            _debugMode = nextKeyInDict(modes, _debugMode);
+        }
     };
 
     self.start = function() {

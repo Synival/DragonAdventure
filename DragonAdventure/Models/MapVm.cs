@@ -10,5 +10,11 @@ namespace DragonAdventure.Models {
         public string Name { get; set; }
         public bool Wrap { get; set; }
         public string[] Ascii { get; set; }
+
+        public string Error { get; set; }
+
+        public MapVm() {}
+        public MapVm(string error) : this()
+            { Error = error; }
     }
 }

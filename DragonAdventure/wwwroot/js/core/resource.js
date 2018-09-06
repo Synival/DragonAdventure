@@ -1,24 +1,35 @@
 "use strict"
 
-function Resource(type, name, callback) {
+function Resource(type, key, callback) {
     var self = this;
+    var keyType = (typeof(key) === 'string') ? 'name' : 'id';
+    var method  = (keyType == 'name') ? 'GetByName' : 'GetById';
+    var id      = (keyType == 'name') ? null : parseFloat(key);
+    var name    = (keyType == 'name') ? key  : null;
+
     var controller = capitalizeString(type);
     self.type    = type;
+    self.id      = id;
     self.name    = name;
-    self.src     = '/' + controller + '/Get?name=' + encodeURIComponent(name);
+    self.src     = '/' + controller + '/' + method +
+        '?' + keyType + '=' + encodeURIComponent(key);
     self.loading = false;
     self.loaded  = false;
     self.failed  = false;
     self.data    = null;
     self.model   = null;
 
-    if (type != null && name != null && type != 'none') {
+    if (type != null && key != null && type != 'none') {
         self.loading = true;
         $.getJSON(self.src, jquerySuccessFunc(self.src, function(result) {
             self.data = result;
+            self.id   = result.id;
+            self.name = result.name;
+
             switch(type) {
                 case 'map':
-                    self.model = new Map(result.name, result.wrap, result.ascii);
+                    self.model = new Map(result.id, result.name, result.wrap,
+                        result.ascii);
                     _maps.set(self.model);
                     break;
                 default:

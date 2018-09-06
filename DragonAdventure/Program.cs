@@ -7,10 +7,12 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using DragonAdventure.Repositories;
 
 namespace DragonAdventure {
     public class Program {
         public static int Main(string[] args) {
+            MapRepository.InitMaps();
             BuildWebHost(args).Run();
             return 0;
         }
