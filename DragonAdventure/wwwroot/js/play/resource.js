@@ -27,16 +27,21 @@ function Resource(type, key, callback) {
                self.key  != null &&
                self.type != 'none';
     }
-    self.src = (!self.isLoadable()) ? null :
-        '/' + controller + '/' + method +
-        '?' + keyType + '=' + encodeURIComponent(key);
+    if (!self.isLoadable())
+        self.src = null;
+    else {
+        self.src = '/' + controller + '/' + method + '/' + encodeURIComponent(key);
+        if (_gameId != null)
+            self.src += '?gameId=' + _gameId;
+        console.log(self.src);
+    }
 
     self.load = function() {
         if (!self.isLoadable() || self.loading || self.loaded || self.failed)
             return;
 
         self.loading = true;
-        api(self.src, function(result) {
+        apiGet(self.src, function(result) {
             self.data = result;
             self.id   = result.id;
             self.name = result.name;
@@ -44,7 +49,7 @@ function Resource(type, key, callback) {
             switch(type) {
                 case 'map':
                     self.model = new Map(result.id, result.name, result.wrap,
-                        result.ascii);
+                        result.ascii, result.tiles);
                     _maps.set(self.model);
                     break;
                 default:

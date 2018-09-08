@@ -4,9 +4,12 @@
             <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Dragon Adventure</a>
         </div>
         <ul class="nav navbar-nav">
+            @if (User.Identity.IsAuthenticated) {
+                <li><a asp-area="" asp-controller="Game" asp-action="Manage">Play</a></li>
+            }
             <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+            <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
         </ul>
         @await Html.PartialAsync("_LoginPartial")
-        </div>
     </div>
 </nav>

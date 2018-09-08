@@ -1,4 +1,6 @@
 @using DragonAdventure.Views.Manage
+@using DragonAdventure.Models.DbModels
+
 @inject SignInManager<ApplicationUser> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();

@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Play Dragon Adventure";
+}
+<link rel='stylesheet' href='/css/game.css' />
+
+<h4>(Game #@ViewData["GameId"])</h4>
+
+<script>
+    var _gameId = @ViewData["GameId"];
+</script>
+
+@using DragonAdventure.Helpers;
+
+<div id='game'></div>
+
+@Html.Partial("_Resources")

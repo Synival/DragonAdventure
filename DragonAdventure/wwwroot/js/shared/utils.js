@@ -130,20 +130,40 @@ function capitalizeString(str) {
     return type.charAt(0).toUpperCase() + type.slice(1);
 }
 
-function api(url, successFunc, failFunc, completeFunc) {
+function api(url, method, data, successFunc, failFunc, completeFunc) {
     var success = null;
-    $.getJSON(url, jquerySuccessFunc(url, function(result) {
-        success = true;
-        if (successFunc)
-            successFunc(result);
-    }))
-    .fail(jqueryErrorFunc(url, function() {
-        success = false;
-        if (failFunc)
-            failFunc(result);
-    }))
-    .complete(function() {
-        if (completeFunc)
-            completeFunc(success);
+    $.ajax({
+        url:         url,
+        method:      method,
+        data:        data,
+        contentType: 'application/json; charset=utf-8',
+        dataType:    'json',
+        success: jquerySuccessFunc(url, function(result) {
+            success = true;
+            if (successFunc)
+                successFunc(result);
+        }),
+        error: jqueryErrorFunc(url, function() {
+            success = false;
+            if (failFunc)
+                failFunc(result);
+        }),
+        complete: function() {
+            if (completeFunc)
+                completeFunc(success);
+        }
     });
+}
+
+function apiGet(url, successFunc, failFunc, completeFunc)
+    { return api(url, 'GET', null, successFunc, failFunc, completeFunc); }
+
+function prettyDate(date, format) {
+    if (date == null)
+        return "(no date)";
+    if (typeof(date) === 'string')
+        date = new Date(date);
+    if (format == null)
+        format = 'M/D/YYYY h:mm:ss a';
+    return moment(date).format(format);
 }

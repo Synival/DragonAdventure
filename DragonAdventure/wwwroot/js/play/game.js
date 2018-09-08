@@ -73,7 +73,7 @@ function Game() {
                 whenLoaded();
         }
 
-        api('/Map/GetList', function(result) {
+        apiGet('/Map/GetList?gameId=' + _gameId, function(result) {
             for (var i = 0; i < result.length; i++)
                 _resources.load('map', result[i].name, loadedFunc);
         });

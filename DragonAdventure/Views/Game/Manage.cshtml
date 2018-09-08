@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Manage Games";
+}
+<link rel='stylesheet' href='/css/manage.css' />
+@using DragonAdventure.Helpers
+
+<div id='resources' style='display: none'>
+    <div id='scripts'>
+        @foreach(var f in FileHelpers.WwwFiles("/js/shared", true))
+            { <script src='@f'></script> }
+        @foreach(var f in FileHelpers.WwwFiles("/js/manage", true))
+            { <script src='@f'></script> }
+    </div>
+</div>
+
+<div id='buttons' style='margin-bottom: 32px'>
+    <button onclick="gameCreate()">Create Game</button>
+</div>
+
+<h4>Active Games:</h4>
+<div id='games'></div>

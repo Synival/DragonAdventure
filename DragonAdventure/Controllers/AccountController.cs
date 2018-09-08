@@ -9,10 +9,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using DragonAdventure.Models;
 using DragonAdventure.Models.AccountViewModels;
 using DragonAdventure.Services;
+using DragonAdventure.Models.DbModels;
 
 namespace DragonAdventure.Controllers {
     [Authorize, Route("[controller]/[action]")]

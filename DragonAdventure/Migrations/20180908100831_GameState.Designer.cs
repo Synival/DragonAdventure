@@ -11,9 +11,10 @@ using System;
 namespace DragonAdventure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180908100831_GameState")]
+    partial class GameState
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,11 +93,7 @@ namespace DragonAdventure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("BattleCount");
-
                     b.Property<int?>("Direction");
-
-                    b.Property<int>("FrameCount");
 
                     b.Property<int>("GameId");
 
@@ -110,16 +107,12 @@ namespace DragonAdventure.Migrations
 
                     b.Property<float?>("MapYPrecise");
 
-                    b.Property<int>("StepCount");
-
                     b.Property<DateTime>("Timestamp");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GameId")
                         .IsUnique();
-
-                    b.HasIndex("MapId");
 
                     b.ToTable("GameState");
                 });
@@ -263,10 +256,6 @@ namespace DragonAdventure.Migrations
                         .WithOne("State")
                         .HasForeignKey("DragonAdventure.Models.DbModels.GameState", "GameId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DragonAdventure.Models.DbModels.Map", "Map")
-                        .WithMany()
-                        .HasForeignKey("MapId");
                 });
 
             modelBuilder.Entity("DragonAdventure.Models.DbModels.Map", b =>

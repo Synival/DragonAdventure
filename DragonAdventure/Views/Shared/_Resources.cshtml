@@ -1,6 +1,6 @@
 @using DragonAdventure.Helpers
 
-<div style='display: none'>
+<div id='resources' style='display: none'>
     <div id='spritesheets'>
         @foreach(var f in FileHelpers.WwwFiles("/images/spritesheets", true))
             { <img src='@f' /> }
@@ -14,7 +14,9 @@
             { <img src='@f' /> }
     </div>
     <div id='scripts'>
-        @foreach(var f in FileHelpers.WwwFiles("/js/core", true))
+        @foreach(var f in FileHelpers.WwwFiles("/js/shared", true))
+            { <script src='@f'></script> }
+        @foreach(var f in FileHelpers.WwwFiles("/js/play", true))
             { <script src='@f'></script> }
     </div>
 </div>

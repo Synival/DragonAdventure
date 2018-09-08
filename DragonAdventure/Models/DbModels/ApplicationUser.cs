@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DragonAdventure.Models {
+namespace DragonAdventure.Models.DbModels {
     public class ApplicationUser : IdentityUser<int> {
         [ForeignKey("PlayerId")]
-        public virtual List<Map> MapList { get; set; }
+        public virtual List<Game> Games { get; set; }
     }
 }

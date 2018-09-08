@@ -1,5 +1,6 @@
 using DragonAdventure.Data;
-using DragonAdventure.Models;
+using DragonAdventure.Extensions;
+using DragonAdventure.Models.DbModels;
 using DragonAdventure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,8 +27,12 @@ namespace DragonAdventure.Controllers {
             _mapRepository = new MapRepository(dbcontext);
         }
 
-        public List<GetMapListVm> GetList(string sort = null) {
-            var query = _mapRepository.GetAll()
+        public List<GetMapListVm> GetList(string sort = null, int? gameId = null) {
+            var playerId = this.GetCurrentPlayerId();
+            var query =
+                ((gameId.HasValue)
+                    ? _mapRepository.GetAll(playerId, gameId)
+                    : _mapRepository.GetAll(playerId))
                 .Select(x => new GetMapListVm() { Id = x.Id, Name = x.Name });
             if (sort == "id")
                 query = query.OrderBy(x => x.Id);
@@ -36,10 +41,20 @@ namespace DragonAdventure.Controllers {
             return query.ToList();
         }
 
-        public MapVm GetByName([Required] string name)
-            => _mapRepository.GetVmByName(name);
+        [Route("{name}")]
+        public MapVm GetByName(string name, int? gameId = null) {
+            var playerId = this.GetCurrentPlayerId();
+            return ((gameId.HasValue)
+                ? _mapRepository.GetVmByName(playerId, gameId, name)
+                : _mapRepository.GetVmByName(playerId, name));
+        }
 
-        public MapVm GetById(int id)
-            => _mapRepository.GetVmById(id);
+        [Route("{id}")]
+        public MapVm GetById(int id, int? gameId = null) {
+            var playerId = this.GetCurrentPlayerId();
+            return (gameId.HasValue)
+                ? _mapRepository.GetVmById(playerId, gameId, id)
+                : _mapRepository.GetVmById(playerId, id);
+        }
     }
 }

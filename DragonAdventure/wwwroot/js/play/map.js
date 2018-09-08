@@ -1,6 +1,6 @@
 "use strict"
 
-function Map(id, name, wrap, ascii) {
+function Map(id, name, wrap, ascii, tiles) {
     var self = this;
     self.id     = id;
     self.name   = name;
@@ -8,22 +8,27 @@ function Map(id, name, wrap, ascii) {
     self.width  = 0;
     self.height = ascii.length;
     self.ascii  = [];
-    self.tiles  = [];
 
-    for (var i = 0; i < self.height; i++) {
-        self.ascii[i] = ascii[i];
-        if (self.ascii[i].length > self.width)
-            self.width = self.ascii[i].length;
+    if (tiles) {
+        self.width = (tiles.length == 0) ? 0 : tiles[0].length;
+        self.tiles = tiles;
     }
-
-    for (var y = 0; y < self.height; y++) {
-        var line = [];
-        var a = self.ascii[y];
-        for (var x = 0; x < a.length; x++)
-            line.push(a.charAt(x));
-        for (var x = a.length; x < self.width; x++)
-            line.push(0);
-        self.tiles.push(line);
+    else {
+        self.tiles = [];
+        for (var i = 0; i < self.height; i++) {
+            self.ascii[i] = ascii[i];
+            if (self.ascii[i].length > self.width)
+                self.width = self.ascii[i].length;
+        }
+        for (var y = 0; y < self.height; y++) {
+            var line = [];
+            var a = self.ascii[y];
+            for (var x = 0; x < a.length; x++)
+                line.push(a.charAt(x));
+            for (var x = a.length; x < self.width; x++)
+                line.push(0);
+            self.tiles.push(line);
+        }
     }
 
     self.getTile = function(x, y) {

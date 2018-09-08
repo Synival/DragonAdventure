@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using DragonAdventure.Data;
-using DragonAdventure.Models;
 using DragonAdventure.Services;
+using DragonAdventure.Models.DbModels;
 
 namespace DragonAdventure {
     public class Startup {

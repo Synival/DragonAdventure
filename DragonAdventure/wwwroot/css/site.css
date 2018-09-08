@@ -124,3 +124,20 @@ a:hover:before, .btn-link:hover:before {
 .form-control:focus {
     border-color: var(--highlight);
 }
+
+table {
+    margin-bottom: 8px;
+    border-collapse: collapse;
+}
+
+table tr th,
+table tr td {
+    border: 1px #888 solid;
+    padding: 4px 8px;
+}
+table tr th {
+    background: #e0e0e0;
+}
+table tr td {
+    background: #f8f8f8;
+}

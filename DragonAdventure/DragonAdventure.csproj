@@ -25,6 +25,8 @@
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
     <Folder Include="wwwroot\fonts\" />
+    <Folder Include="wwwroot\js\manage\" />
+    <Folder Include="_dbcontext\" />
   </ItemGroup>
 
 </Project>

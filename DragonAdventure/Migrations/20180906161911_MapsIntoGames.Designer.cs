@@ -11,9 +11,10 @@ using System;
 namespace DragonAdventure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180906161911_MapsIntoGames")]
+    partial class MapsIntoGames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,6 +79,8 @@ namespace DragonAdventure.Migrations
 
                     b.Property<DateTime>("CreatedOn");
 
+                    b.Property<DateTime>("LastPlayedOn");
+
                     b.Property<int>("PlayerId");
 
                     b.HasKey("Id");
@@ -85,43 +88,6 @@ namespace DragonAdventure.Migrations
                     b.HasIndex("PlayerId");
 
                     b.ToTable("Game");
-                });
-
-            modelBuilder.Entity("DragonAdventure.Models.DbModels.GameState", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("BattleCount");
-
-                    b.Property<int?>("Direction");
-
-                    b.Property<int>("FrameCount");
-
-                    b.Property<int>("GameId");
-
-                    b.Property<int?>("MapId");
-
-                    b.Property<int?>("MapX");
-
-                    b.Property<float?>("MapXPrecise");
-
-                    b.Property<int?>("MapY");
-
-                    b.Property<float?>("MapYPrecise");
-
-                    b.Property<int>("StepCount");
-
-                    b.Property<DateTime>("Timestamp");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GameId")
-                        .IsUnique();
-
-                    b.HasIndex("MapId");
-
-                    b.ToTable("GameState");
                 });
 
             modelBuilder.Entity("DragonAdventure.Models.DbModels.Map", b =>
@@ -255,18 +221,6 @@ namespace DragonAdventure.Migrations
                         .WithMany("Games")
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("DragonAdventure.Models.DbModels.GameState", b =>
-                {
-                    b.HasOne("DragonAdventure.Models.DbModels.Game", "Game")
-                        .WithOne("State")
-                        .HasForeignKey("DragonAdventure.Models.DbModels.GameState", "GameId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DragonAdventure.Models.DbModels.Map", "Map")
-                        .WithMany()
-                        .HasForeignKey("MapId");
                 });
 
             modelBuilder.Entity("DragonAdventure.Models.DbModels.Map", b =>
