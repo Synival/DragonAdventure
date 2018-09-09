@@ -41,7 +41,6 @@ function Player() {
             console.log("Battle!");
             state.battleCount++;
         }
-        _game.updateState();
         _game.queuePatchState();
     };
 

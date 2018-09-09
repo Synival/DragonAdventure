@@ -7,9 +7,10 @@ function Game(id) {
     self.menus     = [];
     self.id        = id;
     self.createdOn = null;
+    self.patchStateFrame = null;
     self.state = {
         timestamp:     new Date(),
-        id:            0,
+        id:            null,
         gameId:        id,
         secondsPlayed: null,
         direction:     null,
@@ -19,15 +20,19 @@ function Game(id) {
         mapY:          null,
         mapXPrecise:   null,
         mapYPrecise:   null,
-        stepCount:     null,
-        frameCount:    null,
-        battleCount:   null,
+        stepCount:     0,
+        frameCount:    0,
+        battleCount:   0,
     };
 
     self.runFrame = function() {
         self.state.frameCount++;
-        if (self.patchStateFrame >= self.state.frameCount)
+        if (self.patchStateFrame != null &&
+            self.state.frameCount >= self.patchStateFrame)
+        {
+            self.updateState();
             self.patchState();
+        }
         _player.runFrame();
         _camera.runFrame();
         _render.runFrame();
@@ -73,13 +78,18 @@ function Game(id) {
 
     self.patchState = function() {
         self.patchStateFrame = null;
-        api('/Game/UpdateState', 'PATCH', self.state);
+        console.log("Patching state...");
+        if (self.state.id != null) {
+            api('/Game/UpdateState', 'PATCH', self.state, function() {
+                console.log("State patched.");
+            });
+        }
     };
 
     self.queuePatchState = function() {
         if (self.patchStateFrame != null)
             return false;
-        self.patchStateFrame = self.frameCount + (60 * 5);
+        self.patchStateFrame = self.state.frameCount + (60 * 5);
         return true;
     };
 
