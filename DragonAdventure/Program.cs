@@ -12,13 +12,12 @@ using DragonAdventure.Repositories;
 namespace DragonAdventure {
     public class Program {
         public static int Main(string[] args) {
-            BuildWebHost(args).Run();
+            CreateWebHostBuilder(args).Build().Run();
             return 0;
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
+                .UseStartup<Startup>();
     }
 }

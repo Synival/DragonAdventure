@@ -1,13 +1,33 @@
 "use strict"
 
-function Game() {
+function Game(id) {
     var self = this;
-    self.interval = null;
-    self.state    = null;
-    self.map      = null;
-    self.menus    = [];
+    self.interval  = null;
+    self.map       = null;
+    self.menus     = [];
+    self.id        = id;
+    self.createdOn = null;
+    self.state = {
+        timestamp:     new Date(),
+        id:            0,
+        gameId:        id,
+        secondsPlayed: null,
+        direction:     null,
+        mapId:         null,
+        mapName:       null,
+        mapX:          null,
+        mapY:          null,
+        mapXPrecise:   null,
+        mapYPrecise:   null,
+        stepCount:     null,
+        frameCount:    null,
+        battleCount:   null,
+    };
 
     self.runFrame = function() {
+        self.state.frameCount++;
+        if (self.patchStateFrame >= self.state.frameCount)
+            self.patchState();
         _player.runFrame();
         _camera.runFrame();
         _render.runFrame();
@@ -26,6 +46,41 @@ function Game() {
         self.map = map;
         _player.moveToTile(x, y);
         _camera.moveTo(_player.x, _player.y, true);
+    };
+
+    self.populateState = function(stateIn) {
+        var stateOut = self.state;
+        for (var key in stateOut) {
+            if (stateOut[key] instanceof Date)
+                stateOut[key] = new Date(stateIn[key]);
+            else
+                stateOut[key] = stateIn[key];
+        }
+    };
+
+    self.updateState = function() {
+        var state = self.state;
+        state.timestamp     = new Date();
+        state.secondsPlayed = parseInt(state.frameCount / 60);
+        state.direction     = _player.direction;
+        state.mapId         = (self.map)     ? self.map.id   : null;
+        state.mapName       = (self.mapName) ? self.map.name : null;
+        state.mapX          = _player.mapX;
+        state.mapY          = _player.mapY;
+        state.mapXPrecise   = _player.x / _tileSize;
+        state.mapYPrecise   = _player.y / _tileSize;
+    };
+
+    self.patchState = function() {
+        self.patchStateFrame = null;
+        api('/Game/UpdateState', 'PATCH', self.state);
+    };
+
+    self.queuePatchState = function() {
+        if (self.patchStateFrame != null)
+            return false;
+        self.patchStateFrame = self.frameCount + (60 * 5);
+        return true;
     };
 
     self.keyPressed = function(key) {
@@ -59,23 +114,26 @@ function Game() {
     };
 
     self.start = function() {
-        if (self.state != null)
-            return;
-
         // Test stuff!!
-        self.state = 'map';
         _player.spritesheet = _spritesheets.get('priest');
 
-        function whenLoaded()
-            { self.setMap(_maps.get('dq2')); }
+        function whenLoaded() {
+            var state = self.state;
+            _player.direction = state.direction;
+            self.setMap(_maps.get(state.mapName),
+                state.mapXPrecise, state.mapYPrecise);
+        }
         function loadedFunc(resource, model) {
             if (_resources.getLoadingCount() == 0)
                 whenLoaded();
         }
 
-        apiGet('/Map/GetList?gameId=' + _gameId, function(result) {
-            for (var i = 0; i < result.length; i++)
-                _resources.load('map', result[i].name, loadedFunc);
+        apiGet('/Game/GetStateById/' + self.id, function(result) {
+            self.populateState(result);
+            apiGet('/Map/GetList?gameId=' + self.id, function(result) {
+                for (var i = 0; i < result.length; i++)
+                    _resources.load('map', result[i].name, loadedFunc);
+            });
         });
 
         _render.runFrame();

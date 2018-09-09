@@ -31,11 +31,18 @@ function Player() {
         { return _keysDown.cancel ? 1.5 : 1.0; }
 
     self.movedEvent = function() {
-        if (self.encounters <= 0)
+        var state = _game.state;
+        state.stepCount++;
+        if (self.encounters <= 0) {
             self.encounters = parseInt(Math.random() * 24) + 8;
+        }
         self.encounters -= self.getMoveTime();
-        if (self.encounters <= 0)
+        if (self.encounters <= 0) {
             console.log("Battle!");
+            state.battleCount++;
+        }
+        _game.updateState();
+        _game.queuePatchState();
     };
 
     self.updateMovement = function() {
@@ -136,6 +143,9 @@ function Player() {
     }
 
     self.moveTo = function(x, y) {
+        x = Math.round(x * 8.00) / 8.00;
+        y = Math.round(y * 8.00) / 8.00;
+
         var ts  = _tileSize;
         var map = _game.map;
         if (map == null) {

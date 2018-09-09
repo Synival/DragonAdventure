@@ -62,9 +62,9 @@ window.addEventListener('load', function() {
     _camera    = new Camera();
     _player    = new Player();
     _render    = new Render();
-    _game      = new Game();
     _maps      = new MapSet();
     _resources = new ResourceSet();
+    _game      = new Game(_gameId);
 
     // Go!
     _game.start();

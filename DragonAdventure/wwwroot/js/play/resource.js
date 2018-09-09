@@ -31,9 +31,8 @@ function Resource(type, key, callback) {
         self.src = null;
     else {
         self.src = '/' + controller + '/' + method + '/' + encodeURIComponent(key);
-        if (_gameId != null)
-            self.src += '?gameId=' + _gameId;
-        console.log(self.src);
+        if (_game.id != null)
+            self.src += '?gameId=' + _game.id;
     }
 
     self.load = function() {

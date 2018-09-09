@@ -28,11 +28,13 @@ namespace DragonAdventure.Controllers {
                 .Select(x => new GameVm(x)).ToList();
         }
 
+        [Route("{gameId}")]
         public GameVm GetById(int gameId) {
             var playerId = this.GetCurrentPlayerId();
             return _gameRepository.GetVmById(playerId, gameId);
         }
 
+        [Route("{gameId}")]
         public GameStateVm GetStateById(int gameId) {
             var playerId = this.GetCurrentPlayerId();
             return _gameRepository.GetStateVmById(playerId, gameId);
@@ -54,6 +56,14 @@ namespace DragonAdventure.Controllers {
                 vm = new GameVm();
             vm.PlayerId = this.GetCurrentPlayerId().Value;
             return _gameRepository.CreateVm(vm);
+        }
+
+        [HttpPatch]
+        public GameStateVm UpdateState([FromBody] GameStateVm vm) {
+            if (vm == null)
+                return new GameStateVm("No state supplied");
+            var playerId = this.GetCurrentPlayerId().Value;
+            return _gameRepository.UpdateStateVm(playerId, vm);
         }
 
         public IActionResult Manage()

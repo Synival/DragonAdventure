@@ -113,31 +113,50 @@ function jquerySuccessFunc(url, func) {
     return function(result) {
         if (result == null)
             return jqueryError(null, null, "Empty result", url);
-        else if (typeof(result.Error) === 'string')
-            return jqueryError(null, null, result.Error);
-        else if (result.Error === true)
+        else if (typeof(result.error) === 'string')
+            return jqueryError(null, null, result.error);
+        else if (result.error === true)
             return jqueryError(null, null, "Error reported", url);
-        else if (result.Error != null)
-            return jqueryError(null, null, result.Error, url);
+        else if (result.error != null)
+            return jqueryError(null, null, result.error, url);
         if (func)
             func.call(this, result);
     };
 }
 
 function capitalizeString(str) {
-    if (typeof(str) !== 'string' || str.length !== 0)
+    if (typeof(str) !== 'string' || str.length < 1)
         return str;
-    return type.charAt(0).toUpperCase() + type.slice(1);
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function fromCamelCase(obj) {
+    console.log(typeof(obj));
+    console.log("DERP!");
+    if (typeof(obj) !== 'object')
+        return obj;
+    var newObj = {};
+    for (var key in obj) {
+        var value = obj[key];
+        var capKey = capitalizeString(key);
+        newObj[capKey] = fromCamelCase(value);
+        console.log('+++ ' + capKey + ' = ' + newObj[capKey]);
+    }
+    return newObj;
 }
 
 function api(url, method, data, successFunc, failFunc, completeFunc) {
     var success = null;
+    if (method.toLowerCase() == 'get')
+        data = null;
+    if (data != null && typeof(data) !== 'string')
+        data = JSON.stringify(data);
+
     $.ajax({
         url:         url,
         method:      method,
         data:        data,
         contentType: 'application/json; charset=utf-8',
-        dataType:    'json',
         success: jquerySuccessFunc(url, function(result) {
             success = true;
             if (successFunc)
@@ -166,4 +185,12 @@ function prettyDate(date, format) {
     if (format == null)
         format = 'M/D/YYYY h:mm:ss a';
     return moment(date).format(format);
+}
+
+function prettyDuration(amount, unit, format) {
+    var duration = moment.utc(
+        moment.duration(amount, unit).as('milliseconds'));
+    if (format == null)
+        format = 'H:mm:ss';
+    return duration.format(format);
 }

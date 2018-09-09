@@ -42,8 +42,8 @@ function gameGetAll(callback) {
                         '<tr>' +
                             '<td>' + prettyDate(game.createdOn) + '</td>' +
                             '<td>' + prettyDate(state.timestamp) + '</td>' +
-                            '<td>' + state.timePlayed  + '</td>' +
-                            '<td>' + state.mapId + ' (' + state.mapX + ', ' + state.mapY + ')</td>' +
+                            '<td>' + prettyDuration(state.secondsPlayed, 'seconds') + '</td>' +
+                            '<td>' + state.mapName + ' (' + state.mapX + ', ' + state.mapY + ')</td>' +
                             '<td>' + state.stepCount   + '</td>' +
                             '<td>' + state.frameCount  + '</td>' +
                             '<td>' + state.battleCount + '</td>' +

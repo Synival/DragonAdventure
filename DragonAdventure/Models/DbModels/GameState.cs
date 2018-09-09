@@ -13,8 +13,8 @@ namespace DragonAdventure.Models.DbModels {
         public int GameId { get; set; }
         public DateTime Timestamp { get; set; }
 
-        public int FrameCount { get; set; }
-        public int StepCount { get; set; }
+        public long FrameCount { get; set; }
+        public long StepCount { get; set; }
         public int BattleCount { get; set; }
 
         public int? Direction { get; set; }
@@ -35,8 +35,8 @@ namespace DragonAdventure.Models.DbModels {
         public int GameId { get; set; }
         public DateTime Timestamp { get; set; }
 
-        public int FrameCount { get; set; }
-        public int StepCount { get; set; }
+        public long FrameCount { get; set; }
+        public long StepCount { get; set; }
         public int BattleCount { get; set; }
 
         public int? Direction { get; set; }
@@ -46,26 +46,26 @@ namespace DragonAdventure.Models.DbModels {
         public int? MapX { get; set; }
         public int? MapY { get; set; }
 
-        public TimeSpan TimePlayed { get; set; }
+        public long SecondsPlayed { get; set; }
         public string MapName { get; set; }
 
         public GameStateVm() : base() {}
         public GameStateVm(string error) : base(error) {}
         public GameStateVm(GameState model) {
-            Id          = model.Id;
-            GameId      = model.GameId;
-            Timestamp   = model.Timestamp;
-            FrameCount  = model.FrameCount;
-            StepCount   = model.StepCount;
-            BattleCount = model.BattleCount;
-            Direction   = model.Direction;
-            MapId       = model.MapId;
-            MapXPrecise = model.MapXPrecise;
-            MapYPrecise = model.MapYPrecise;
-            MapX        = model.MapX;
-            MapY        = model.MapY;
-            TimePlayed  = TimeSpan.FromSeconds(model.FrameCount / 60.00f);
-            MapName     = model.Map?.Name;
+            Id            = model.Id;
+            GameId        = model.GameId;
+            Timestamp     = model.Timestamp;
+            FrameCount    = model.FrameCount;
+            StepCount     = model.StepCount;
+            BattleCount   = model.BattleCount;
+            Direction     = model.Direction;
+            MapId         = model.MapId;
+            MapXPrecise   = model.MapXPrecise;
+            MapYPrecise   = model.MapYPrecise;
+            MapX          = model.MapX;
+            MapY          = model.MapY;
+            SecondsPlayed = model.FrameCount / 60;
+            MapName       = model.Map.Name;
         }
     }
 
@@ -76,7 +76,9 @@ namespace DragonAdventure.Models.DbModels {
         public GameWithStateVm() : base() {}
         public GameWithStateVm(string error) : base(error) {}
 
-        public GameWithStateVm(Game game, GameState state) {
+        public GameWithStateVm(Game game, GameState state = null) {
+            if (state == null)
+                state = game.State;
             Game  = new GameVm(game);
             State = new GameStateVm(state);
         }

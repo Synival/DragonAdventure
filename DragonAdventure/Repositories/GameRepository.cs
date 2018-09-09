@@ -1,5 +1,6 @@
-﻿using DragonAdventure.Data;
+using DragonAdventure.Data;
 using DragonAdventure.Models.DbModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -73,5 +74,35 @@ namespace DragonAdventure.Repositories {
 
         public GameVm CreateVm(GameVm vm)
             => new GameVm(Create(vm));
+
+        public GameState UpdateState(int? playerId, GameStateVm vm) {
+            var state = GetStateById(playerId, vm.GameId);
+            if (state == null)
+                return null;
+            if (state.Timestamp > vm.Timestamp || state.FrameCount > vm.FrameCount)
+                return state;
+
+            state.Timestamp   = DateTime.UtcNow;
+            state.Direction   = vm.Direction;
+            state.MapId       = vm.MapId;
+            state.MapX        = vm.MapX;
+            state.MapY        = vm.MapY;
+            state.MapXPrecise = vm.MapXPrecise;
+            state.MapYPrecise = vm.MapYPrecise;
+            state.FrameCount  = vm.FrameCount;
+            state.StepCount   = vm.StepCount;
+            state.BattleCount = vm.BattleCount;
+            _dbcontext.Update(state);
+            _dbcontext.SaveChanges();
+
+            return state;
+        }
+
+        public GameStateVm UpdateStateVm(int? playerId, GameStateVm vm) {
+            var state = UpdateState(playerId, vm);
+            if (state == null)
+                return new GameStateVm($"Can't update state with game id #{vm.GameId}");
+            return new GameStateVm(state);
+        }
     }
 }
