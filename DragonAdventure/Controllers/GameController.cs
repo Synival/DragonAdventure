@@ -4,6 +4,7 @@ using DragonAdventure.Models.DbModels;
 using DragonAdventure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -29,41 +30,41 @@ namespace DragonAdventure.Controllers {
         }
 
         [Route("{gameId}")]
-        public GameVm GetById(int gameId) {
+        public async Task<GameVm> GetById(int gameId) {
             var playerId = this.GetCurrentPlayerId();
-            return _gameRepository.GetVmById(playerId, gameId);
+            return await _gameRepository.GetVmByIdAsync(playerId, gameId);
         }
 
         [Route("{gameId}")]
-        public GameStateVm GetStateById(int gameId) {
+        public async Task<GameStateVm> GetStateById(int gameId) {
             var playerId = this.GetCurrentPlayerId();
-            return _gameRepository.GetStateVmById(playerId, gameId);
+            return await _gameRepository.GetStateVmByIdAsync(playerId, gameId);
         }
 
-        public List<GameWithStateVm> GetAllWithState() {
+        public async Task<List<GameWithStateVm>> GetAllWithState() {
             var playerId = this.GetCurrentPlayerId();
-            return _gameRepository
+            return (await _gameRepository
                 .GetAll(playerId)
                 .Select(x => new { Game = x, State = x.State })
-                .ToList()
+                .ToListAsync())
                 .Select(x => new GameWithStateVm(x.Game, x.State))
                 .ToList();
         }
 
         [HttpPost]
-        public GameVm Create(GameVm vm) {
+        public async Task<GameVm> Create(GameVm vm) {
             if (vm == null)
                 vm = new GameVm();
             vm.PlayerId = this.GetCurrentPlayerId().Value;
-            return _gameRepository.CreateVm(vm);
+            return await _gameRepository.CreateVmAsync(vm);
         }
 
         [HttpPatch]
-        public GameStateVm UpdateState([FromBody] GameStateVm vm) {
+        public async Task<GameStateVm> UpdateState([FromBody] GameStateVm vm) {
             if (vm == null)
                 return new GameStateVm("No state supplied");
             var playerId = this.GetCurrentPlayerId().Value;
-            return _gameRepository.UpdateStateVm(playerId, vm);
+            return await _gameRepository.UpdateStateVmAsync(playerId, vm);
         }
 
         public IActionResult Manage()

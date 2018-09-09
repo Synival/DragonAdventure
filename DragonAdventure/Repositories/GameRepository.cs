@@ -19,34 +19,34 @@ namespace DragonAdventure.Repositories {
         public IQueryable<Game> GetAll(int? playerId)
             => _dbcontext.Games.Where(x => playerId == null || x.PlayerId == playerId);
 
-        public Game GetById(int? playerId, int gameId)
-            => GetAll(playerId).FirstOrDefault(x => x.Id == gameId);
+        public async Task<Game> GetByIdAsync(int? playerId, int gameId)
+            => await GetAll(playerId).FirstOrDefaultAsync(x => x.Id == gameId);
 
-        public GameState GetStateById(int? playerId, int gameId)
-            => GetAll(playerId).Select(x => x.State).FirstOrDefault(x => x.GameId == gameId);
+        public async Task<GameState> GetStateByIdAsync(int? playerId, int gameId)
+            => await GetAll(playerId).Select(x => x.State).FirstOrDefaultAsync(x => x.GameId == gameId);
 
-        public GameVm GetVmById(int? playerId, int gameId) {
-            var game = GetById(playerId, gameId);
+        public async Task<GameVm> GetVmByIdAsync(int? playerId, int gameId) {
+            var game = await GetByIdAsync(playerId, gameId);
             return (game != null)
                 ? new GameVm(game)
                 : new GameVm($"Cannot find game with id #{gameId}'");
         }
 
-        public GameStateVm GetStateVmById(int? playerId, int gameId) {
-            var state = GetStateById(playerId, gameId);
+        public async Task<GameStateVm> GetStateVmByIdAsync(int? playerId, int gameId) {
+            var state = await GetStateByIdAsync(playerId, gameId);
             return (state != null)
                 ? new GameStateVm(state)
                 : new GameStateVm($"Cannot find game state with id #{gameId}'");
         }
 
-        public GameWithStateVm GetVmWithStateById(int? playerId, int gameId) {
-            var game = GetById(playerId, gameId);
+        public async Task<GameWithStateVm> GetVmWithStateByIdAsync(int? playerId, int gameId) {
+            var game = await GetByIdAsync(playerId, gameId);
             return (game != null)
                 ? new GameWithStateVm(game, game.State)
                 : new GameWithStateVm($"Cannot find game with id #{gameId}'");
         }
 
-        public Game Create(GameVm vm) {
+        public async Task<Game> CreateAsync(GameVm vm) {
             var now = DateTime.UtcNow;
 
             var newGame = new Game() {
@@ -54,9 +54,9 @@ namespace DragonAdventure.Repositories {
                 CreatedOn = now,
             };
             _dbcontext.Add(newGame);
-            _dbcontext.SaveChanges();
+            await _dbcontext.SaveChangesAsync();
 
-            var dq2 = _mapRepository.GetVmByName(null, "dq2");
+            var dq2 = await _mapRepository.GetVmByNameAsync(null, "dq2");
             var newGameState = new GameState() {
                 GameId      = newGame.Id,
                 Timestamp   = now,
@@ -68,15 +68,15 @@ namespace DragonAdventure.Repositories {
                 MapY        = dq2.Height / 2,
             };
             _dbcontext.Add(newGameState);
-            _dbcontext.SaveChanges();
+            await _dbcontext.SaveChangesAsync();
             return newGame;
         }
 
-        public GameVm CreateVm(GameVm vm)
-            => new GameVm(Create(vm));
+        public async Task<GameVm> CreateVmAsync(GameVm vm)
+            => new GameVm(await CreateAsync(vm));
 
-        public GameState UpdateState(int? playerId, GameStateVm vm) {
-            var state = GetStateById(playerId, vm.GameId);
+        public async Task<GameState> UpdateStateAsync(int? playerId, GameStateVm vm) {
+            var state = await GetStateByIdAsync(playerId, vm.GameId);
             if (state == null)
                 return null;
             if (state.Timestamp > vm.Timestamp || state.FrameCount > vm.FrameCount)
@@ -98,8 +98,8 @@ namespace DragonAdventure.Repositories {
             return state;
         }
 
-        public GameStateVm UpdateStateVm(int? playerId, GameStateVm vm) {
-            var state = UpdateState(playerId, vm);
+        public async Task<GameStateVm> UpdateStateVmAsync(int? playerId, GameStateVm vm) {
+            var state = await UpdateStateAsync(playerId, vm);
             if (state == null)
                 return new GameStateVm($"Can't update state with game id #{vm.GameId}");
             return new GameStateVm(state);

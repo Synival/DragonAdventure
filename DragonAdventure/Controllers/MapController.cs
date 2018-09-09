@@ -42,19 +42,19 @@ namespace DragonAdventure.Controllers {
         }
 
         [Route("{name}")]
-        public MapVm GetByName(string name, int? gameId = null) {
+        public async Task<MapVm> GetByName(string name, int? gameId = null) {
             var playerId = this.GetCurrentPlayerId();
-            return ((gameId.HasValue)
-                ? _mapRepository.GetVmByName(playerId, gameId, name)
-                : _mapRepository.GetVmByName(playerId, name));
+            return await ((gameId.HasValue)
+                ? _mapRepository.GetVmByNameAsync(playerId, gameId, name)
+                : _mapRepository.GetVmByNameAsync(playerId, name));
         }
 
         [Route("{id}")]
-        public MapVm GetById(int id, int? gameId = null) {
+        public async Task<MapVm> GetById(int id, int? gameId = null) {
             var playerId = this.GetCurrentPlayerId();
-            return (gameId.HasValue)
-                ? _mapRepository.GetVmById(playerId, gameId, id)
-                : _mapRepository.GetVmById(playerId, id);
+            return await ((gameId.HasValue)
+                ? _mapRepository.GetVmByIdAsync(playerId, gameId, id)
+                : _mapRepository.GetVmByIdAsync(playerId, id));
         }
     }
 }
