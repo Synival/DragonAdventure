@@ -1,6 +1,15 @@
 "use strict"
 
-function keysUpdate() {
+function keyRunFrame() {
+    keyUpdateDown();
+}
+
+var _keyUpdateNeeded = false;
+function keyUpdateDown() {
+    if (_keyUpdateNeeded == false)
+        return;
+    _keyUpdateNeeded = false;
+
     var newKeysDown = {
         up:        _keyCodesDown[38] || _keyCodesDown[104],
         down:      _keyCodesDown[40] || _keyCodesDown[98],
@@ -25,19 +34,32 @@ function keysUpdate() {
         { newKeysDown.left = false; newKeysDown.right = false; }
 
     for (var key in newKeysDown) {
-        if (_keysDown[key] != newKeysDown[key]) {
-            _keysDown[key] = newKeysDown[key];
-            if (_keysDown[key])
-                keyPressed(key);
-        }
+        var down = newKeysDown[key];
+        _keysDown[key] = down;
+
+        var pressed = _keysPressed[key];
+        if (pressed == null || down == false)
+            pressed = 0;
+        if (down == true && pressed == 0)
+            pressed = 1;
+        _keysPressed[key] = pressed;
     }
+}
+
+function keyPollOnePressed() {
+    for (var key in _keysPressed)
+        if (_keysPressed[key] == 1) {
+            _keysPressed[key] = 2;
+            return key;
+        }
+    return null;
 }
 
 function keyEventFunc(value) {
     return function(e) {
         if (e.which < 256)
             _keyCodesDown[e.which] = value;
-        keysUpdate();
+        _keyUpdateNeeded = true;
         if (e.which >= 33 && e.which <= 40)
             e.preventDefault();
     }
@@ -49,7 +71,7 @@ function keysInit() {
     window.addEventListener('blur', function() {
         for (var key in _keyCodesDown)
             _keyCodesDown[key] = false;
-        keysUpdate();
+        keyUpdateDown();
     });
 }
 

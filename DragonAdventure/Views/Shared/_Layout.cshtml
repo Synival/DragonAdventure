@@ -3,7 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dragon Adventure - @ViewData["Title"]</title>
+    <title>Dragon Adventure
+        @if(ViewData["Title"] != null) {
+            <text>- @ViewData["Title"]</text>
+        }
+    </title>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -42,7 +46,7 @@
                 <h2>@ViewData["Title"]</h2>
             }
             @if(ViewData["Message"] != null) {
-                <h3>@ViewData["Message"]</h3>
+                <h4>@ViewData["Message"]</h4>
             }
             @RenderBody()
         </div>

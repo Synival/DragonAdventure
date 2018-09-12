@@ -49,14 +49,14 @@ namespace DragonAdventure.Repositories {
             var map = await GetByIdAsync(playerId, id);
             return (map != null)
                 ? new MapVm(map)
-                : new MapVm($"Cannot find map with id #{id}'");
+                : new MapVm($"Cannot find map with id #{id}");
         }
 
         public async Task<MapVm> GetVmByIdAsync(int? playerId, int? gameId, int id) {
             var map = await GetByIdAsync(playerId, gameId, id);
             return (map != null)
                 ? new MapVm(map)
-                : new MapVm($"Cannot find map with id #{id}' for game #{gameId}");
+                : new MapVm($"Cannot find map with id #{id} for game #{gameId}");
         }
     }
 }

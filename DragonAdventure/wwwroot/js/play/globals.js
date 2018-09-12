@@ -23,6 +23,7 @@ var _keyCodesDown = [];
 for (var i = 0; i < 256; i++)
     _keyCodesDown[i] = false;
 var _keysDown = {};
+var _keysPressed = {};
 
 var _debugMode = 'none';
 

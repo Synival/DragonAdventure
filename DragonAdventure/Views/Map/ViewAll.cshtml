@@ -1,0 +1,29 @@
+﻿@model List<DragonAdventure.Models.DbModels.MapVm>
+@{
+    ViewData["Title"] = "View All Maps";
+}
+
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Game</th>
+            <th>Name</th>
+            <th>Wrap?</th>
+            <th>Width</th>
+            <th>Height</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var map in Model) { <tr>
+            <td>@map.Id</td>
+            <td>@(map.GameId?.ToString() ?? "(none)")</td>
+            <td>@map.Name</td>
+            <td>@map.Wrap</td>
+            <td>@map.Width</td>
+            <td>@map.Height</td>
+            <td><a href='/Map/ViewById/@map.Id'>View</a></td>
+        </tr> }
+    </tbody>
+</table>

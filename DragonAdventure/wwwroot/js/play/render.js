@@ -19,12 +19,43 @@ function Render() {
 
         var map = _game.map;
         if (map != null)
-            self.drawMap(destCtx, map);
+            self.drawMap(map);
+        for (var i = 0; i < _game.menus.length; i++)
+            self.drawMenu(_game.menus[i]);
+
         self.drawDebug(_debugMode);
 
         var count = _resources.getLoadingCount();
         if (count > 0)
             self.drawText(1, _canvasHeight - 11, "Loading " + count + " resources...");
+    };
+
+    self.drawRect = function(x, y, width, height, color) {
+        var destCtx = self.getContext();
+        var cox = _canvasOffsetX;
+        var coy = _canvasOffsetY;
+        destCtx.fillStyle = color;
+        destCtx.fillRect(x + cox, y + coy, width, height);
+    };
+
+    self.drawMenu = function(menu) {
+        var b = menu.border;
+        var s = menu.border - 2;
+        var x = menu.x;
+        var y = menu.y;
+        var w = menu.width;
+        var h = menu.height;
+        self.drawRect(x,       y,       w,   h,   '#000');
+        self.drawRect(x+1,     y+2,     s,   h-4, '#fff');
+        self.drawRect(x+w-s-1, y+2,     s,   h-4, '#fff');
+        self.drawRect(x+2,     y+1,     w-4, s,   '#fff');
+        self.drawRect(x+2,     y+h-s-1, w-4, s,   '#fff');
+
+        b += menu.borderInner;
+        for (var i = 0; i < menu.texts.length; i++) {
+            var t = menu.texts[i];
+            self.drawText(menu.x + t.x + b, menu.y + t.y + b, t.text);
+        }
     };
 
     self.drawDebug = function(mode) {

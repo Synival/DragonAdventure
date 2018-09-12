@@ -1,8 +1,9 @@
-﻿@{
+﻿@using DragonAdventure.Helpers
+@model List<DragonAdventure.Models.DbModels.GameWithStateVm>
+
+@{
     ViewData["Title"] = "Manage Games";
 }
-<link rel='stylesheet' href='/css/manage.css' />
-@using DragonAdventure.Helpers
 
 <div id='resources' style='display: none'>
     <div id='scripts'>
@@ -18,4 +19,37 @@
 </div>
 
 <h4>Active Games:</h4>
-<div id='games'></div>
+<div id='games'>
+    @if (Model.Count == 0)
+        {<p>You have no active games.</p>}
+    else {
+        <table id='games-table'>
+            <thead><tr>
+                <th>Created on:</th>
+                <th>Last played:</th>
+                <th>Time played:</th>
+                <th>Map:</th>
+                <th># of steps:</th>
+                <th># of frames:</th>
+                <th># of battles:</th>
+                <th></th>
+                <th></th>
+            </tr></thead>
+            <tbody>@foreach (var row in Model) {
+                var game  = row.Game;
+                var state = row.State;
+                <tr>
+                    <td>@FormatHelpers.PrettyDate(game.CreatedOn)</td>
+                    <td>@FormatHelpers.PrettyDate(state.Timestamp)</td>
+                    <td>@FormatHelpers.PrettyDuration(state.SecondsPlayed, "seconds")</td>
+                    <td>@state.MapName (@state.MapX, @state.MapY)</td>
+                    <td>@state.StepCount</td>
+                    <td>@state.FrameCount</td>
+                    <td>@state.BattleCount</td>
+                    <td><button onclick="gamePlay(@game.Id)">Play!</button></td>
+                    <td><button onclick="gameDelete(@game.Id)">Delete</button></td>
+                </tr>
+            }</tbody>
+        </table>
+    }
+</div>

@@ -1,0 +1,36 @@
+﻿@model DragonAdventure.Models.DbModels.MapVm
+@{
+    ViewData["Title"] = "View Map";
+}
+
+<table id='view-map-table'>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>GameId</th>
+            <th>Name</th>
+            <th>Wrap?</th>
+            <th>Width</th>
+            <th>Height</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.Id</td>
+            <td>@(Model.GameId?.ToString() ?? "(none)")</td>
+            <td>@Model.Name</td>
+            <td>@Model.Wrap</td>
+            <td>@Model.Width</td>
+            <td>@Model.Height</td>
+        </tr>
+    </tbody>
+</table>
+
+<div id='view-map-tiles'> @{
+    var array  = Model.Tiles;
+    var height = array.GetLength(0);
+    var width  = array.GetLength(0);
+    for (var y = 0; y < height; y++)
+        {<p>@for (var x = 0; x < width; x++)
+            {@array[y, x]}</p>}
+} </div>

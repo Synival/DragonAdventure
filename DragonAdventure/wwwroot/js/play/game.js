@@ -8,6 +8,7 @@ function Game(id) {
     self.id        = id;
     self.createdOn = null;
     self.patchStateFrame = null;
+    self.scene     = null;
     self.state = {
         timestamp:     new Date(),
         id:            null,
@@ -27,14 +28,32 @@ function Game(id) {
 
     self.runFrame = function() {
         self.state.frameCount++;
+
+        keyRunFrame();
         if (self.patchStateFrame != null &&
             self.state.frameCount >= self.patchStateFrame)
         {
             self.updateState();
             self.patchState();
         }
-        _player.runFrame();
-        _camera.runFrame();
+        if (self.menus.length == 0) {
+            _player.runFrame();
+            _camera.runFrame();
+        }
+        else {
+            self.menus[self.menus.length - 1].runFrame();
+        }
+
+        while (true) {
+            var target = self.keyTarget();
+            if (target.keyReady != null && !target.keyReady())
+                break;
+            var key = keyPollOnePressed();
+            if (key == null)
+                break;
+            self.keyPressed(target, key);
+        }
+
         _render.runFrame();
     };
 
@@ -93,33 +112,77 @@ function Game(id) {
         return true;
     };
 
-    self.keyPressed = function(key) {
-        if (key == 'special1')
-            _player.spritesheet = _spritesheets.next(_player.spritesheet);
-        else if (key == 'special2')
-            self.setMap(_maps.next(self.map));
-        else if (key == 'special3') {
-            var modes = {
-                'instant':  null,
-                'constant': null,
-                'smooth':   null,
-            };
-            _camera.moveMethod = nextKeyInDict(modes, _camera.moveMethod);
+    self.keyTarget = function() {
+        if (self.menus.length > 0)
+            return self.menus[self.menus.length - 1];
+        return self;
+    };
+
+    self.keyAction = function() {
+        switch (self.scene) {
+            case 'map':
+                self.menus.push(new Menu(16, 16, 'test'));
+                break;
         }
-        else if (key == 'special4') {
-            var modes = {
-                'dq':     null,
-                'smooth': null,
-            };
-            _player.moveMethod = nextKeyInDict(modes, _player.moveMethod);
-        }
-        else if (key == 'special10') {
-            var modes = {
-                'none':   null,
-                'coords': null,
-                'map':    null,
-            };
-            _debugMode = nextKeyInDict(modes, _debugMode);
+    };
+
+    self.keyReady = function() {
+        return _player.canMoveNow();
+    };
+
+    self.keyPressed = function(target, key) {
+        switch (key) {
+            case 'action':
+                if (target.keyAction != null)
+                    target.keyAction();
+                break;
+
+            case 'cancel':
+                if (target.keyCancel != null)
+                    target.keyCancel();
+                break;
+
+            case 'up':
+            case 'down':
+            case 'left':
+            case 'right':
+                if (target.keyDirection != null)
+                    target.keyDirection(key);
+                break;
+
+            case 'special1':
+                _player.spritesheet = _spritesheets.next(_player.spritesheet);
+                break;
+
+            case 'special2':
+                self.setMap(_maps.next(self.map));
+                break;
+
+            case 'special3':
+                var modes = {
+                    'instant':  null,
+                    'constant': null,
+                    'smooth':   null,
+                };
+                _camera.moveMethod = nextKeyInDict(modes, _camera.moveMethod);
+                break;
+
+            case 'special4':
+                var modes = {
+                    'dq':     null,
+                    'smooth': null,
+                };
+                _player.moveMethod = nextKeyInDict(modes, _player.moveMethod);
+                break;
+
+            case 'special10':
+                var modes = {
+                    'none':   null,
+                    'coords': null,
+                    'map':    null,
+                };
+                _debugMode = nextKeyInDict(modes, _debugMode);
+                break;
         }
     };
 
@@ -132,6 +195,7 @@ function Game(id) {
             _player.direction = state.direction;
             self.setMap(_maps.get(state.mapName),
                 state.mapXPrecise, state.mapYPrecise);
+            self.scene = 'map';
         }
         function loadedFunc(resource, model) {
             if (_resources.getLoadingCount() == 0)

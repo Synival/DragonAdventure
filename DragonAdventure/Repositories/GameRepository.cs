@@ -29,7 +29,7 @@ namespace DragonAdventure.Repositories {
             var game = await GetByIdAsync(playerId, gameId);
             return (game != null)
                 ? new GameVm(game)
-                : new GameVm($"Cannot find game with id #{gameId}'");
+                : new GameVm($"Cannot find game with id #{gameId}");
         }
 
         public async Task<GameStateVm> GetStateVmByIdAsync(int? playerId, int gameId) {
@@ -38,6 +38,13 @@ namespace DragonAdventure.Repositories {
                 ? new GameStateVm(state)
                 : new GameStateVm($"Cannot find game state with id #{gameId}'");
         }
+
+        public async Task<List<GameWithStateVm>> GetAllVmsWithState(int? playerId)
+            => (await GetAll(playerId)
+                .Select(x => new { Game = x, State = x.State })
+                .ToListAsync())
+                .Select(x => new GameWithStateVm(x.Game, x.State))
+                .ToList();
 
         public async Task<GameWithStateVm> GetVmWithStateByIdAsync(int? playerId, int gameId) {
             var game = await GetByIdAsync(playerId, gameId);
@@ -103,6 +110,15 @@ namespace DragonAdventure.Repositories {
             if (state == null)
                 return new GameStateVm($"Can't update state with game id #{vm.GameId}");
             return new GameStateVm(state);
+        }
+
+        public async Task<bool> DeleteGameAsync(int? playerId, int gameId) {
+            var game = await GetByIdAsync(playerId, gameId);
+            if (game == null)
+                return false;
+            _dbcontext.Games.Remove(game);
+            await _dbcontext.SaveChangesAsync();
+            return true;
         }
     }
 }

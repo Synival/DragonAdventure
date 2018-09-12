@@ -1,5 +1,3 @@
 "use strict"
 
-window.addEventListener('load', function() {
-    gameGetAll();
-});
+window.addEventListener('load', function() {});

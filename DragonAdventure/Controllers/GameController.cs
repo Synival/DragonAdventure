@@ -1,5 +1,6 @@
 using DragonAdventure.Data;
 using DragonAdventure.Extensions;
+using DragonAdventure.Models;
 using DragonAdventure.Models.DbModels;
 using DragonAdventure.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace DragonAdventure.Controllers {
     [Authorize, Route("[controller]/[action]")]
-    public class GameController : Controller {
+    public class GameController : AppController {
         private readonly GameRepository _gameRepository;
 
         private ApplicationDbContext _dbcontext = null;
@@ -22,40 +23,27 @@ namespace DragonAdventure.Controllers {
             _gameRepository = new GameRepository(dbcontext);
         }
 
-        public List<GameVm> GetAll() {
-            var playerId = this.GetCurrentPlayerId();
-            return _gameRepository
-                .GetAll(playerId).ToList()
+        public List<GameVm> GetAll()
+            => _gameRepository
+                .GetAll(PlayerId).ToList()
                 .Select(x => new GameVm(x)).ToList();
-        }
+ 
+        [Route("{gameId}")]
+        public async Task<GameVm> GetById(int gameId)
+            => await _gameRepository.GetVmByIdAsync(PlayerId, gameId);
 
         [Route("{gameId}")]
-        public async Task<GameVm> GetById(int gameId) {
-            var playerId = this.GetCurrentPlayerId();
-            return await _gameRepository.GetVmByIdAsync(playerId, gameId);
-        }
+        public async Task<GameStateVm> GetStateById(int gameId)
+            => await _gameRepository.GetStateVmByIdAsync(PlayerId, gameId);
 
-        [Route("{gameId}")]
-        public async Task<GameStateVm> GetStateById(int gameId) {
-            var playerId = this.GetCurrentPlayerId();
-            return await _gameRepository.GetStateVmByIdAsync(playerId, gameId);
-        }
-
-        public async Task<List<GameWithStateVm>> GetAllWithState() {
-            var playerId = this.GetCurrentPlayerId();
-            return (await _gameRepository
-                .GetAll(playerId)
-                .Select(x => new { Game = x, State = x.State })
-                .ToListAsync())
-                .Select(x => new GameWithStateVm(x.Game, x.State))
-                .ToList();
-        }
+        public async Task<List<GameWithStateVm>> GetAllWithState()
+            => await _gameRepository.GetAllVmsWithState(PlayerId);
 
         [HttpPost]
         public async Task<GameVm> Create(GameVm vm) {
             if (vm == null)
                 vm = new GameVm();
-            vm.PlayerId = this.GetCurrentPlayerId().Value;
+            vm.PlayerId = PlayerId.Value;
             return await _gameRepository.CreateVmAsync(vm);
         }
 
@@ -63,15 +51,24 @@ namespace DragonAdventure.Controllers {
         public async Task<GameStateVm> UpdateState([FromBody] GameStateVm vm) {
             if (vm == null)
                 return new GameStateVm("No state supplied");
-            var playerId = this.GetCurrentPlayerId().Value;
-            return await _gameRepository.UpdateStateVmAsync(playerId, vm);
+            return await _gameRepository.UpdateStateVmAsync(PlayerId, vm);
         }
 
-        public IActionResult Manage()
-            => View();
+        [HttpDelete]
+        [Route("{gameId}")]
+        public async Task<bool> Delete(int gameId)
+            => await _gameRepository.DeleteGameAsync(PlayerId, gameId);
+
+        public async Task<IActionResult> Manage() {
+            var games = await _gameRepository.GetAllVmsWithState(PlayerId);
+            return View(games);
+        }
 
         [Route("{gameId}")]
-        public IActionResult Play(int gameId) {
+        public async Task<IActionResult> Play(int gameId) {
+            var game = await _gameRepository.GetVmByIdAsync(PlayerId, gameId);
+            if (game.Error != null)
+                return NotFound(game.Error);
             ViewData["GameId"] = gameId;
             return View();
         }
