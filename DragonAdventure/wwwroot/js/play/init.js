@@ -45,6 +45,9 @@ window.addEventListener('load', function() {
     _tileset.set(' ', new Tile('void',         null,                "#000", 0.00));
     _tileset.set(';', new Tile('cave',         null,                "#420", 0.00));
 
+    // Other tiles used for drawing
+    _menuTile = new Tile('menu', "menu_dq.png", "#fff", 0.00);
+
     // Load some sprite sheets
     _spritesheets = new SpritesheetSet();
     //_spritesheets.set(new Spritesheet('archer',      'archer.png'));

@@ -18,13 +18,13 @@ function Menu(x, y, type, params) {
     self.texts       = [];
     self.controls    = [];
     self.control     = null;
-    self.border      = 4;
-    self.borderInner = 2;
+    self.border      = _menuTile.width;
+    self.borderInner = Math.max(1, 6 - self.border);
 
     switch (type) {
         case 'test':
             self.width = 100;
-            self.height = 60 + (self.border + self.borderInner) * 2 - 1;
+            self.height = 60 + ((self.border + self.borderInner) * 2) - 1;
             self.texts = [
                 new MenuText(0,   0, 'Foo'),
                 new MenuText(0,  10, 'Bar'),

@@ -38,23 +38,60 @@ function Render() {
         destCtx.fillRect(x + cox, y + coy, width, height);
     };
 
+    self.drawImages = function(destCtx, images, x, y, width, height) {
+        for (var i = 0; i < images.length; i++) {
+            var img = images[i];
+            var w = (width  == null) ? img.width
+                : Math.min(width  - img.offX,  img.width);
+            var h = (height == null) ? img.height
+                : Math.min(height - img.offY, img.height);
+            if (w <= 0 || h <= 0)
+                continue;
+            destCtx.drawImage(img.element,
+                img.x,        img.y,        img.width, img.height,
+                img.offX + x, img.offY + y, w, h);
+        }
+    };
+
     self.drawMenu = function(menu) {
+        var destCtx = self.getContext();
+        var tile    = _menuTile;
+
         var b = menu.border;
-        var s = menu.border - 2;
+        var B = menu.borderInner;
         var x = menu.x;
         var y = menu.y;
         var w = menu.width;
         var h = menu.height;
-        self.drawRect(x,       y,       w,   h,   '#000');
-        self.drawRect(x+1,     y+2,     s,   h-4, '#fff');
-        self.drawRect(x+w-s-1, y+2,     s,   h-4, '#fff');
-        self.drawRect(x+2,     y+1,     w-4, s,   '#fff');
-        self.drawRect(x+2,     y+h-s-1, w-4, s,   '#fff');
 
-        b += menu.borderInner;
+        // draw background
+        var b2 = Math.ceil(menu.border / 2);
+        self.drawRect(x+b2, y+b2, w-(b2*2), h-(b2*2), '#000');
+
+        // draw left/right sides
+        var t1 = tile.getBorderImages(8);
+        var t2 = tile.getBorderImages(4);
+        for (var i = b; i < w-b; i += b) {
+            var s = Math.min(w-b-i, b);
+            self.drawImages(destCtx, t1, x+i, y,     s, null);
+            self.drawImages(destCtx, t1, x+i, y+h-b, s, null);
+        }
+        for (var i = b; i < h-b; i += b) {
+            var s = Math.min(h-b-i, b);
+            self.drawImages(destCtx, t2, x,     y+i, null, s);
+            self.drawImages(destCtx, t2, x+w-b, y+i, null, s);
+        }
+
+        // draw corners
+        self.drawImages(destCtx, tile.getBorderImages(7), x,     y);
+        self.drawImages(destCtx, tile.getBorderImages(9), x+w-b, y);
+        self.drawImages(destCtx, tile.getBorderImages(1), x,     y+h-b);
+        self.drawImages(destCtx, tile.getBorderImages(3), x+w-b, y+h-b);
+
+        // draw text
         for (var i = 0; i < menu.texts.length; i++) {
             var t = menu.texts[i];
-            self.drawText(menu.x + t.x + b, menu.y + t.y + b, t.text);
+            self.drawText(menu.x + t.x + b+B, menu.y + t.y + b+B, t.text);
         }
     };
 
@@ -254,14 +291,8 @@ function Render() {
                 var px     = x * _tileSize;
                 var py     = y * _tileSize;
 
-                if (images.length > 0) {
-                    for (var i = 0; i < images.length; i++) {
-                        var img = images[i];
-                        context.drawImage(img.element,
-                            img.x,         img.y,         img.width, img.height,
-                            img.offX + px, img.offY + py, img.width, img.height);
-                    }
-                }
+                if (images.length > 0)
+                    self.drawImages(context, images, px, py);
                 else {
                     context.fillStyle = tile.color;
                     context.fillRect(px, py, _tileSize, _tileSize);

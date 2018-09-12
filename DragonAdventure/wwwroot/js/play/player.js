@@ -13,7 +13,7 @@ function Player() {
     self.moveTimer   = 0;
     self.encounters  = 0;
     self.moveMethod  = 'smooth';
-    self.direction   = 0;
+    self.direction   = 2;
     self.moveFrames  = 0;
     self.justMoved   = false;
     self.spritesheet = null;
@@ -180,14 +180,15 @@ function Player() {
         if (self.moveMethod == 'dq' && x != 0)
             y = 0;
 
-             if (x == 0 && y >  0) self.direction = 0;
+        // (numpad directions)
+             if (x == 0 && y >  0) self.direction = 2;
         else if (x <  0 && y >  0) self.direction = 1;
-        else if (x <  0 && y == 0) self.direction = 2;
-        else if (x <  0 && y <  0) self.direction = 3;
-        else if (x == 0 && y <  0) self.direction = 4;
-        else if (x >  0 && y <  0) self.direction = 5;
+        else if (x <  0 && y == 0) self.direction = 4;
+        else if (x <  0 && y <  0) self.direction = 7;
+        else if (x == 0 && y <  0) self.direction = 8;
+        else if (x >  0 && y <  0) self.direction = 9;
         else if (x >  0 && y == 0) self.direction = 6;
-        else if (x >  0 && y >  0) self.direction = 7;
+        else if (x >  0 && y >  0) self.direction = 3;
 
         if (self.moveMethod == 'dq') {
             nx = (self.targetMapX + x) * ts;
@@ -274,11 +275,23 @@ function Player() {
         var ss = self.spritesheet;
         if (ss == null)
             return null;
+
+        var imageDirection = null;
+        switch (self.direction) {
+            case 2: imageDirection = 0; break;
+            case 1: imageDirection = 1; break;
+            case 4: imageDirection = 2; break;
+            case 7: imageDirection = 3; break;
+            case 8: imageDirection = 4; break;
+            case 9: imageDirection = 5; break;
+            case 6: imageDirection = 6; break;
+            case 3: imageDirection = 7; break;
+        }
         return {
             element: ss.element,
             width:   _tileSize,
             height:  _tileSize,
-            x:       self.direction * _tileSize,
+            x:       imageDirection * _tileSize,
             y:       (Math.ceil(self.moveFrames / 15) % 2) * _tileSize,
             offX:    0,
             offY:    0

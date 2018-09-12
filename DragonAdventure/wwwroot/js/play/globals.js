@@ -19,6 +19,8 @@ var _sectorHeight    = (Math.ceil(_canvasHeight / _tileSize)) * _tileSize;
 var _sectorNumTilesX = _sectorWidth  / _tileSize;
 var _sectorNumTilesY = _sectorHeight / _tileSize;
 
+var _menuTile = null;
+
 var _keyCodesDown = [];
 for (var i = 0; i < 256; i++)
     _keyCodesDown[i] = false;
