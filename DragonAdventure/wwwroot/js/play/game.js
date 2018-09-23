@@ -112,6 +112,12 @@ function Game(id) {
         return true;
     };
 
+    self.newMenu = function(x, y, type, params) {
+        var menu = new Menu(x, y, type, params);
+        self.menus.push(menu);
+        return menu;
+    };
+
     self.keyTarget = function() {
         if (self.menus.length > 0)
             return self.menus[self.menus.length - 1];
@@ -121,7 +127,7 @@ function Game(id) {
     self.keyAction = function() {
         switch (self.scene) {
             case 'map':
-                self.menus.push(new Menu(16, 16, 'test'));
+                self.newMenu(8, 8, 'map');
                 break;
         }
     };
@@ -134,12 +140,12 @@ function Game(id) {
         switch (key) {
             case 'action':
                 if (target.keyAction != null)
-                    target.keyAction();
+                    target.keyAction.call(target);
                 break;
 
             case 'cancel':
                 if (target.keyCancel != null)
-                    target.keyCancel();
+                    target.keyCancel.call(target);
                 break;
 
             case 'up':
@@ -147,41 +153,7 @@ function Game(id) {
             case 'left':
             case 'right':
                 if (target.keyDirection != null)
-                    target.keyDirection(key);
-                break;
-
-            case 'special1':
-                _player.spritesheet = _spritesheets.next(_player.spritesheet);
-                break;
-
-            case 'special2':
-                self.setMap(_maps.next(self.map));
-                break;
-
-            case 'special3':
-                var modes = {
-                    'instant':  null,
-                    'constant': null,
-                    'smooth':   null,
-                };
-                _camera.moveMethod = nextKeyInDict(modes, _camera.moveMethod);
-                break;
-
-            case 'special4':
-                var modes = {
-                    'dq':     null,
-                    'smooth': null,
-                };
-                _player.moveMethod = nextKeyInDict(modes, _player.moveMethod);
-                break;
-
-            case 'special10':
-                var modes = {
-                    'none':   null,
-                    'coords': null,
-                    'map':    null,
-                };
-                _debugMode = nextKeyInDict(modes, _debugMode);
+                    target.keyDirection.call(target, key);
                 break;
         }
     };

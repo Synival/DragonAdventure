@@ -93,9 +93,18 @@ function Render() {
             var t = menu.texts[i];
             self.drawText(menu.x + t.x + b+B, menu.y + t.y + b+B, t.text);
         }
+
+        // draw control indicator
+        if (menu.control != null) {
+            var c = menu.control;
+            self.drawText(menu.x + c.x + b+B, menu.y + c.y + b+B, ">");
+        }
     };
 
     self.drawDebug = function(mode) {
+        if (mode == 'none')
+            return;
+
         var pos = 1;
         var f = function(t1, t2, t3) {
             if (t1) self.drawText(1, pos, t1);
@@ -105,6 +114,7 @@ function Render() {
         }
 
         if (mode == 'coords') {
+            self.drawRect(0, 0, _canvasWidth, 60, "rgba(0,0,0,0.5)");
             f("Player:",  _player.x,          _player.y);
             f("tPlayer:", _player.targetX,    _player.targetY);
             f("Map:",     _player.mapX,       _player.mapY);
@@ -114,6 +124,7 @@ function Render() {
         }
 
         if (mode == 'map') {
+            self.drawRect(0, 0, _canvasWidth, 40, "rgba(0,0,0,0.5)");
             f("Map:",        (_game.map == null) ? '(null)'
                 : (_game.map.name + ' (#' + _game.map.id + ')'));
             f("Dimensions:", (_game.map == null) ? ''
