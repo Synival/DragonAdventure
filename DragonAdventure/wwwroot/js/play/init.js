@@ -50,20 +50,19 @@ window.addEventListener('load', function() {
 
     // Load some sprite sheets
     _spritesheets = new SpritesheetSet();
-    //_spritesheets.set(new Spritesheet('archer',      'archer.png'));
-    //_spritesheets.set(new Spritesheet('birdsoldier', 'birdsoldier.png'));
-    //_spritesheets.set(new Spritesheet('knight',      'knight.png'));
-    //_spritesheets.set(new Spritesheet('monk',        'monk.png'));
     _spritesheets.set(new Spritesheet('priest',      'priest.png'));
     _spritesheets.set(new Spritesheet('soldier',     'soldier.png'));
-    //_spritesheets.set(new Spritesheet('warrior',     'warrior.png'));
-    //_spritesheets.set(new Spritesheet('wizard',      'wizard.png'));
+  //_spritesheets.set(new Spritesheet('archer',      'archer.png'));
+  //_spritesheets.set(new Spritesheet('birdsoldier', 'birdsoldier.png'));
+  //_spritesheets.set(new Spritesheet('knight',      'knight.png'));
+  //_spritesheets.set(new Spritesheet('monk',        'monk.png'));
+  //_spritesheets.set(new Spritesheet('warrior',     'warrior.png'));
+  //_spritesheets.set(new Spritesheet('wizard',      'wizard.png'));
 
     // Initialize our game state
     fontInit();
     keysInit();
     _camera    = new Camera();
-    _player    = new Player();
     _render    = new Render();
     _maps      = new MapSet();
     _resources = new ResourceSet();

@@ -12,6 +12,10 @@ var Camera = function() {
     self.deltaTargetY = 0;
     self.moveMethod = 'smooth';
 
+    self.moveToTile = function(x, y, finish) {
+        self.moveTo(x * _tileSize, y * _tileSize, finish);
+    }
+
     self.moveTo = function(x, y, finish) {
         self.targetX = x;
         self.targetY = y;
@@ -34,6 +38,8 @@ var Camera = function() {
     };
 
     self.updateTarget = function() {
+        if (_player == null)
+            return false;
         if (self.targetX == _player.x && self.targetY == _player.y)
             return false;
         self.targetX = _player.x;

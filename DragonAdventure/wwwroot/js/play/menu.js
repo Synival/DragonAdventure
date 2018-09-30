@@ -106,14 +106,18 @@ function Menu(x, y, type, params) {
 
             case 'test':
                 self.setInnerSize(160, 108);
-
-                var spriteText = self.newText(77,  0, _player.spritesheet.name);
+                var spriteText = self.newText(77,  0, (_player == null)
+                    ? 'N/A' : (_player.spritesheet == null)
+                    ? "null" : _player.spritesheet.name);
                 var mapTest    = self.newText(77, 10, _game.map.name);
                 var cameraText = self.newText(77, 20, _camera.moveMethod);
-                var moveText   = self.newText(77, 30, _player.moveMethod);
+                var moveText   = self.newText(77, 30, (_player == null)
+                    ? 'N/A' : _player.moveMethod);
                 var infoText   = self.newText(77, 40, _debugMode);
 
                 self.newTextControl(7,  0, "Sprite:", function() {
+                    if (_player == null)
+                        return;
                     _player.spritesheet = _spritesheets.next(_player.spritesheet);
                     spriteText.text = _player.spritesheet.name;
                 });
@@ -127,6 +131,8 @@ function Menu(x, y, type, params) {
                     cameraText.text = _camera.moveMethod;
                 });
                 self.newTextControl(7, 30, "Move:", function() {
+                    if (_player == null)
+                        return;
                     var modes = { 'dq': null, 'smooth': null };
                     _player.moveMethod = nextKeyInDict(modes, _player.moveMethod);
                     moveText.text = _player.moveMethod;

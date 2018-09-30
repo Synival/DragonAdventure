@@ -63,6 +63,8 @@ function Render() {
         var y = menu.y;
         var w = menu.width;
         var h = menu.height;
+        var cox = _canvasOffsetX;
+        var coy = _canvasOffsetY;
 
         // draw background
         var b2 = Math.ceil(menu.border / 2);
@@ -73,20 +75,20 @@ function Render() {
         var t2 = tile.getBorderImages(4);
         for (var i = b; i < w-b; i += b) {
             var s = Math.min(w-b-i, b);
-            self.drawImages(destCtx, t1, x+i, y,     s, null);
-            self.drawImages(destCtx, t1, x+i, y+h-b, s, null);
+            self.drawImages(destCtx, t1, x+i+cox, y+coy,     s, null);
+            self.drawImages(destCtx, t1, x+i+cox, y+h-b+coy, s, null);
         }
         for (var i = b; i < h-b; i += b) {
             var s = Math.min(h-b-i, b);
-            self.drawImages(destCtx, t2, x,     y+i, null, s);
-            self.drawImages(destCtx, t2, x+w-b, y+i, null, s);
+            self.drawImages(destCtx, t2, x+cox,     y+i+coy, null, s);
+            self.drawImages(destCtx, t2, x+w-b+cox, y+i+coy, null, s);
         }
 
         // draw corners
-        self.drawImages(destCtx, tile.getBorderImages(7), x,     y);
-        self.drawImages(destCtx, tile.getBorderImages(9), x+w-b, y);
-        self.drawImages(destCtx, tile.getBorderImages(1), x,     y+h-b);
-        self.drawImages(destCtx, tile.getBorderImages(3), x+w-b, y+h-b);
+        self.drawImages(destCtx, tile.getBorderImages(7), x+cox,     y+coy);
+        self.drawImages(destCtx, tile.getBorderImages(9), x+w-b+cox, y+coy);
+        self.drawImages(destCtx, tile.getBorderImages(1), x+cox,     y+h-b+coy);
+        self.drawImages(destCtx, tile.getBorderImages(3), x+w-b+cox, y+h-b+coy);
 
         // draw text
         for (var i = 0; i < menu.texts.length; i++) {
@@ -115,12 +117,14 @@ function Render() {
 
         if (mode == 'coords') {
             self.drawRect(0, 0, _canvasWidth, 60, "rgba(0,0,0,0.5)");
-            f("Player:",  _player.x,          _player.y);
-            f("tPlayer:", _player.targetX,    _player.targetY);
-            f("Map:",     _player.mapX,       _player.mapY);
-            f("tMap:",    _player.targetMapX, _player.targetMapY);
             f("Camera:",  _camera.x,          _camera.x);
             f("tCamera:", _camera.targetX,    _camera.targetY);
+            if (_player != null) {
+                f("Player:",  _player.x,          _player.y);
+                f("tPlayer:", _player.targetX,    _player.targetY);
+                f("Map:",     _player.mapX,       _player.mapY);
+                f("tMap:",    _player.targetMapX, _player.targetMapY);
+            }
         }
 
         if (mode == 'map') {
@@ -129,8 +133,9 @@ function Render() {
                 : (_game.map.name + ' (#' + _game.map.id + ')'));
             f("Dimensions:", (_game.map == null) ? ''
                 : (_game.map.width + 'x' + _game.map.height));
-            f("Walk mode:",  _player.moveMethod);
             f("Cam. mode: ", _camera.moveMethod);
+            if (_player != null)
+                f("Walk mode:",  _player.moveMethod);
         }
     };
 
@@ -164,10 +169,10 @@ function Render() {
         var destCtx = self.getContext();
         var ts  = _tileSize;
         var ts2 = parseInt(ts / 2);
-        var mw  = map.width;
-        var mh  = map.height;
-        var mwt = mw * ts;
-        var mht = mh * ts;
+        //var mw  = map.width;
+        //var mh  = map.height;
+        //var mwt = mw * ts;
+        //var mht = mh * ts;
 
         var topLeft = _camera.getTopLeftInt();
         var offsetX = Math.round(mod(topLeft.x + ts2, _sectorWidth));
@@ -190,38 +195,8 @@ function Render() {
                 Math.round(sy - offsetY + coy));
         }
 
-    /*  (this draws a little box around our player's current tile)
-        var pmx = mod(_player.mapX * ts - topLeft.x, mwt);
-        var pmy = mod(_player.mapY * ts - topLeft.y, mht);
-
-        destCtx.strokeStyle = '#fff';
-        destCtx.beginPath();
-        destCtx.rect(pmx + cox - ts2 - 0.5, pmy + coy - ts2 - 0.5, ts + 1, ts + 1);
-        destCtx.stroke();
-        destCtx.closePath();
-    */
-
-        var ps  = ts;
-        var ps2 = parseInt(ps / 2);
-        var px  = Math.round(_player.x) - topLeft.x;
-        var py  = Math.round(_player.y) - topLeft.y;
-
-        var img = _player.getImage();
-        if (img != null) {
-            px += (cox - ps2);
-            py += (coy - ps2);
-            destCtx.drawImage(img.element,
-                img.x,         img.y,         img.width, img.height,
-                img.offX + px, img.offY + py, img.width, img.height);
-        }
-        else {
-            ps  = ts * 0.75;
-            ps2 = parseInt(ps / 2);
-            px += (cox - ps2);
-            py += (coy - ps2);
-            destCtx.fillStyle = '#fff';
-            destCtx.fillRect(px, py, ps, ps);
-        }
+        for (var i = 0; i < _game.actors.length; i++)
+            self.drawActor(_game.actors[i], map);
 
         if (_canvasElementWidth > _canvasWidth ||
             _canvasElementHeight > _canvasHeight)
@@ -234,6 +209,88 @@ function Render() {
                 _canvasWidth + 2, _canvasHeight + 2);
             destCtx.stroke();
             destCtx.closePath();
+        }
+    };
+
+    self.drawActor = function(actor, map) {
+        var destCtx = self.getContext();
+        var topLeft = _camera.getTopLeftInt();
+        var ts  = _tileSize;
+        var ps  = ts;
+        var ps2 = parseInt(ps / 2);
+        var cox = _canvasOffsetX;
+        var coy = _canvasOffsetY;
+        var sw  = _sectorWidth;
+        var sh  = _sectorHeight;
+        var px  = Math.round(actor.x);
+        var py  = Math.round(actor.y);
+        var mw  = map.width;
+        var mh  = map.height;
+        var mwt = mw * ts;
+        var mht = mh * ts;
+        var cw  = _canvasWidth;
+        var ch  = _canvasHeight;
+        var found = false;
+
+        // find the sector that would contain this actor
+        for (var i = 0; i < self.sectors.length; i++) {
+            var sector = self.sectors[i];
+            var sx1 = mod(sector.x * sw, mwt);
+            var sy1 = mod(sector.y * sh, mht);
+            var sx2 = sx1 + sw;
+            var sy2 = sy1 + sh;
+
+            // are our actor's coordinates located in this sector?
+            if (px+ps2 >= sx1 && px-ps2 < sx2 &&
+                py+ps2 >= sy1 && py-ps2 < sy2)
+            {
+                // get where our sprite would draw. is this on screen?
+                var npx = sector.x * sw + (px - sx1) - topLeft.x;
+                var npy = sector.y * sh + (py - sy1) - topLeft.y;
+                if (npx+ps2 >= 0 && npx-ps2 < cw &&
+                    npy+ps2 >= 0 && npy-ps2 < ch)
+                {
+                    // it's on screen - signal to draw here and wrap up
+                    px = npx;
+                    py = npy;
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found)
+            return;
+
+/*
+        // draw a little box around our actor's current tile
+        var ts2 = parseInt(ts / 2);
+        var pmx = mod(actor.mapX * ts - topLeft.x, mwt);
+        var pmy = mod(actor.mapY * ts - topLeft.y, mht);
+
+        destCtx.strokeStyle = '#fff';
+        destCtx.beginPath();
+        destCtx.rect(pmx + cox - ts2 - 0.5, pmy + coy - ts2 - 0.5, ts + 1, ts + 1);
+        destCtx.stroke();
+        destCtx.closePath();
+*/
+
+        // Draw an image if it's available
+        var img = actor.getImage();
+        if (img != null) {
+            px += (cox - ps2);
+            py += (coy - ps2);
+            destCtx.drawImage(img.element,
+                img.x,         img.y,         img.width, img.height,
+                img.offX + px, img.offY + py, img.width, img.height);
+        }
+        // No image - draw a simple rectangle
+        else {
+            ps  = _tileSize * 0.75;
+            ps2 = parseInt(ps / 2);
+            px += (cox - ps2);
+            py += (coy - ps2);
+            destCtx.fillStyle = '#fff';
+            destCtx.fillRect(px, py, ps, ps);
         }
     };
 

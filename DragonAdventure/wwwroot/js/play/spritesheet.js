@@ -21,6 +21,8 @@ function SpritesheetSet() {
 
     self.nextName = function(name)
         { return nextKeyInDict(self.spritesheets, name); };
-    self.next = function(prev)
-        { return self.get(self.nextName(prev.name)); }
+    self.next = function(prev) {
+        var next = self.nextName(prev == null ? null : prev.name);
+        return self.get(next);
+    };
 }

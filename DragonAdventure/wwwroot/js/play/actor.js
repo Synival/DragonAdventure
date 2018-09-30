@@ -1,6 +1,6 @@
 "use strict"
 
-function Player() {
+function Actor(params) {
     var self = this;
     self.x           = 0;
     self.y           = 0;
@@ -11,12 +11,41 @@ function Player() {
     self.targetMapX  = 0;
     self.targetMapY  = 0;
     self.moveTimer   = 0;
-    self.encounters  = 0;
-    self.moveMethod  = 'smooth';
+    self.moveMethod  = 'dq';
     self.direction   = 2;
     self.moveFrames  = 0;
     self.justMoved   = false;
     self.spritesheet = null;
+
+    if (params != null) {
+        if (params.mapX != null) {
+            self.mapX = parseInt(params.mapX);
+            self.x    = self.mapX * _tileSize;
+        }
+        else if (params.x != null) {
+            self.x    = parseInt(params.x * 8) / 8;
+            self.mapX = Math.round(self.x / _tileSize);
+        }
+
+        if (params.mapY != null) {
+            self.mapY = parseInt(params.mapY);
+            self.y    = self.mapY * _tileSize;
+        }
+        else if (params.y != null) {
+            self.y    = parseInt(params.y * 8) / 8;
+            self.mapY = Math.round(self.y / _tileSize);
+        }
+
+        if (params.moveMethod != null)
+            self.moveMethod = params.moveMethod;
+
+        if (params.spritesheet != null) {
+            if (typeof(params.spritesheet) === 'string')
+                self.spritesheet = _spritesheets.get(params.spritesheet);
+            else if (typeof(params.spritesheet) === 'object')
+                self.spritesheet = params.spritesheet;
+        }
+    }
 
     self.getMoveTime = function(map, x, y) {
         if (map == null) map = _game.map;
@@ -25,23 +54,14 @@ function Player() {
         if (y   == null) y   = self.mapY;
         var tile = map.getTile(x, y);
         return 1.00 / ((tile.walkSpeed > 0.25) ? tile.walkSpeed : 0.25);
-    }
+    };
 
     self.getMoveSpeed = function()
-        { return _keysDown.cancel ? 1.5 : 1.0; }
+        { return _keysDown.cancel ? 1.5 : 1.0; };
 
     self.movedEvent = function() {
-        var state = _game.state;
-        state.stepCount++;
-        if (self.encounters <= 0) {
-            self.encounters = parseInt(Math.random() * 24) + 8;
-        }
-        self.encounters -= self.getMoveTime();
-        if (self.encounters <= 0) {
-            console.log("Battle!");
-            state.battleCount++;
-        }
-        _game.queuePatchState();
+        if (self == _player)
+            _game.playerMovedEvent();
     };
 
     self.updateMovement = function() {

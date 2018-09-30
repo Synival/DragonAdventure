@@ -9,6 +9,8 @@ function Game(id) {
     self.createdOn = null;
     self.patchStateFrame = null;
     self.scene     = null;
+    self.actors    = [];
+
     self.state = {
         timestamp:     new Date(),
         id:            null,
@@ -24,6 +26,7 @@ function Game(id) {
         stepCount:     0,
         frameCount:    0,
         battleCount:   0,
+        encounters:    0,
     };
 
     self.runFrame = function() {
@@ -37,8 +40,10 @@ function Game(id) {
             self.patchState();
         }
         if (self.menus.length == 0) {
-            _player.runFrame();
-            _camera.runFrame();
+            if (_player != null)
+                _player.runFrame();
+            if (_camera != null)
+                _camera.runFrame();
         }
         else {
             self.menus[self.menus.length - 1].runFrame();
@@ -68,8 +73,15 @@ function Game(id) {
         }
 
         self.map = map;
-        _player.moveToTile(x, y);
-        _camera.moveTo(_player.x, _player.y, true);
+        if (_player != null) {
+            _player.moveToTile(x, y);
+            _camera.moveTo(_player.x, _player.y, true);
+        }
+        else {
+            _camera.moveToTile(
+                (map.width  / 2) - 0.5,
+                (map.height / 2) - 0.5, true);
+        }
     };
 
     self.populateState = function(stateIn) {
@@ -80,6 +92,15 @@ function Game(id) {
             else
                 stateOut[key] = stateIn[key];
         }
+
+        // FAKE ACTOR
+        self.newActor({ mapX: 32, mapY: 16, spritesheet: 'soldier' });
+
+        // TODO: real actor data!
+        _player = self.newActor({
+            spritesheet: 'priest',
+            moveMethod:  'smooth'
+        });
     };
 
     self.updateState = function() {
@@ -118,6 +139,12 @@ function Game(id) {
         return menu;
     };
 
+    self.newActor = function(params) {
+        var actor = new Actor(params);
+        self.actors.push(actor);
+        return actor;
+    };
+
     self.keyTarget = function() {
         if (self.menus.length > 0)
             return self.menus[self.menus.length - 1];
@@ -133,7 +160,7 @@ function Game(id) {
     };
 
     self.keyReady = function() {
-        return _player.canMoveNow();
+        return _player == null || _player.canMoveNow();
     };
 
     self.keyPressed = function(target, key) {
@@ -158,13 +185,25 @@ function Game(id) {
         }
     };
 
-    self.start = function() {
-        // Test stuff!!
-        _player.spritesheet = _spritesheets.get('priest');
+    self.playerMovedEvent = function() {
+        var state = self.state;
+        state.stepCount++;
+        if (state.encounters <= 0 || state.encounters == null)
+            state.encounters = parseInt(Math.random() * 24) + 8;
+        state.encounters -= _player.getMoveTime();
 
+        if (state.encounters <= 0) {
+            console.log("Battle!");
+            state.battleCount++;
+        }
+        self.queuePatchState();
+    };
+
+    self.start = function() {
         function whenLoaded() {
             var state = self.state;
-            _player.direction = state.direction;
+            if (_player != null)
+                _player.direction = state.direction;
             self.setMap(_maps.get(state.mapName),
                 state.mapXPrecise, state.mapYPrecise);
             self.scene = 'map';
