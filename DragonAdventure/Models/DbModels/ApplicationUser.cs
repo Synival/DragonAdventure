@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DragonAdventure.Models.DbModels {
     public class ApplicationUser : IdentityUser<int> {
-        [ForeignKey("PlayerId")]
         public virtual List<Game> Games { get; set; }
     }
 }
