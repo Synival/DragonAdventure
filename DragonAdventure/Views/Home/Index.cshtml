@@ -3,6 +3,6 @@
 }
 
 @if (User.Identity.IsAuthenticated)
-    { @Html.Partial("_IndexLoggedIn") }
+    { @await Html.PartialAsync("_IndexLoggedIn") }
 else
-    { @Html.Partial("_IndexAnonymous") }
+    { @await Html.PartialAsync("_IndexAnonymous") }
